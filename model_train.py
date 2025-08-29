@@ -15,7 +15,7 @@ def simple_tokenizer(txt):
 # -------------------------------
 # Load intents file
 # -------------------------------
-with open("intents.json", "r") as f:
+with open("data/intents.json", "r") as f:
     intents = json.load(f)
 
 # -------------------------------
