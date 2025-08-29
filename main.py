@@ -4,7 +4,6 @@ import sys
 import time
 import webbrowser
 import pyautogui
-import pyttsx3
 import speech_recognition as sr
 import json
 import random
@@ -114,20 +113,21 @@ def send_whatsapp_message(phone_number, message):
 # -------------------------------
 # Text-to-Speech
 # -------------------------------
-engine = pyttsx3.init("espeak")
-engine.setProperty("voice", "english")
-engine.setProperty("rate", 150)
-engine.setProperty("volume", 1.0)
+# engine = pyttsx3.init("espeak")
+# engine.setProperty("voice", "english")
+# engine.setProperty("rate", 150)
+# engine.setProperty("volume", 1.0)
 
 def speak(text, speed=1.0, clarity=True):
-    os.system(f'pico2wave -w temp.wav "{text}" > /dev/null 2>&1')
-    cmd = "sox temp.wav temp_out.wav"
-    if speed != 1.0:
-        cmd += f" tempo {speed}"
-    if clarity:
-        cmd += " treble +5 highpass 200"
-    cmd += " && aplay temp_out.wav > /dev/null 2>&1"
-    os.system(cmd)
+    # os.system(f'pico2wave -w temp.wav "{text}" > /dev/null 2>&1')
+    # cmd = "sox temp.wav temp_out.wav"
+    # if speed != 1.0:
+    #     cmd += f" tempo {speed}"
+    # if clarity:
+    #     cmd += " treble +5 highpass 200"
+    # cmd += " && aplay temp_out.wav > /dev/null 2>&1"
+    # os.system(cmd)
+    os.system(f'edge-playback --text "{text}" --voice en-US-AriaNeural > /dev/null 2>&1')
 
 # -------------------------------
 # Speech Recognition
