@@ -248,6 +248,62 @@
             "responses": [
                 "I was made in 2025, if that's what you are asking!"
             ]
+        },
+        {
+            "tag": "open_app_control",
+            "patterns": [
+                "open google",                
+                "open whatsapp",
+                "open instagram",
+                "open youtube",
+                "open chrome",
+                "launch whatsapp",
+                "start whatsapp",
+                "launch instagram",
+                "start youtube"
+            ],
+            "responses": [
+                "Opening the app...",
+                "Sure, launching it...",
+                "Okay, opening now."
+            ]
+        },
+        {
+            "tag": "close_app_control",
+            "patterns": [
+                "close google",
+                "close whatsapp",
+                "close instagram",
+                "close youtube",
+                "close chrome",
+                "quit whatsapp",
+                "exit whatsapp",
+                "quit instagram",
+                "exit youtube"
+            ],
+            "responses": [
+                "Closing the app...",
+                "Sure, quitting it...",
+                "Okay, exiting now."
+            ]
+        },
+        {
+            "tag": "system_conditions",
+            "patterns": [
+                "volume up",
+                "volume down",
+                "increase volume",
+                "decrease volume",
+                "mute volume",
+                "system condition",
+                "battery status",
+                "cpu usage"
+            ],
+            "responses": [
+                "System function executed",
+                "Okay, doing that.",
+                "Done Boss!"
+            ]
         }
     ]
 }
