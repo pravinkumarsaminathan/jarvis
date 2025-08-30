@@ -4,7 +4,10 @@ import time
 import webbrowser
 import subprocess
 import psutil
+import json
+import requests
 import speech_recognition as sr
+import nmap
 
 def command():
     r = sr.Recognizer()
@@ -29,19 +32,41 @@ def command():
         os.dup2(old_stderr, 2)
         os.close(devnull)
 
-def speak(text, speed=1.0, clarity=True):
-    os.system(f'edge-playback --text "{text}" --voice en-US-AriaNeural > /dev/null 2>&1')
+def speak(text, speed=1.0):
+    """
+    Stream TTS from local server and play instantly with mpg123.
+    """
+    payload = {
+        "input": text,
+        "voice": "en-US-AriaNeural",
+        "response_format": "mp3",
+        "speed": speed
+    }
+
+    curl_cmd = [
+        "curl", "-s", "-X", "POST", "http://localhost:5050/v1/audio/speech",
+        "-H", "Content-Type: application/json",
+        "-H", "Authorization: Bearer your_api_key_here",
+        "-d", json.dumps(payload)
+    ]
+
+    mpg123_cmd = ["mpg123", "-"]
+    curl_proc = subprocess.Popen(curl_cmd, stdout=subprocess.PIPE)
+    subprocess.run(mpg123_cmd, stdin=curl_proc.stdout, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    curl_proc.stdout.close()
+    curl_proc.wait()
+    #os.system(f'edge-playback --text "{text}" --voice en-US-AriaNeural > /dev/null 2>&1')
 
 def wish_me():
     hour = int(datetime.datetime.now().hour)
-    t = time.strftime("%I:%M:%p")
+    t = time.strftime("%I:%M %p")  # ✅ gives "12:00 AM"
     day = cal_day()
     if hour < 12:
         speak(f"Good morning Pravin, it is {day} and the time is {t}")
     elif hour < 17:
         speak(f"Good afternoon Pravin, it is {day} and the time is {t}")
     else:
-        speak(f'Good evening Pravin, it is {day} and the time is {t}')
+        speak(f"Good evening Pravin, it is {day} and the time is {t}")
 
 def cal_day():
     day = datetime.datetime.today().weekday() + 1
@@ -85,6 +110,43 @@ def close_app(cmd):
         os.system("pkill -f gimp > /dev/null 2>&1")
     else:
         speak("sorry i don't have access to do that.")
+
+# def scan_vulnerable_ports():
+#     try:
+#         nm = nmap.PortScanner()
+#         # Run nmap with vulnerability detection scripts
+#         nm.scan('127.0.0.1', arguments='-sV --script vuln')
+#         speak("Scanning for vulnerable ports...")
+#         vulnerable_ports = []
+
+#         for host in nm.all_hosts():
+#             for proto in nm[host].all_protocols():
+#                 for port, details in nm[host][proto].items():
+#                     if details['state'] == "open":
+#                         script_output = details.get('script', {})
+#                         if script_output:  # If vulnerability script found something
+#                             vulnerable_ports.append(f"{port} ({details['name']})")
+#         speak("Finished scanning...")
+#         if vulnerable_ports:
+#             ports_str = ", ".join(vulnerable_ports)
+#             speak(f"The vulnerable ports on your system are {ports_str}")
+#         else:
+#             speak("No vulnerable ports detected on your system")
+#     except Exception as e:
+#         speak("Sorry boss, I could not complete the port scan")
+#         print(f"[Error] {e}")
+
+
+# def close_port(port):
+#     try:
+#         # Using ufw to block the port
+#         cmd = f"sudo ufw deny {port}"
+#         os.system(cmd + " > /dev/null 2>&1")
+#         speak(f"Port {port} has been blocked successfully")
+#     except Exception as e:
+#         speak(f"Sorry boss, I could not close port {port}")
+#         print(f"[Error] {e}")
+
 
 def schedule():
     today = cal_day().lower()

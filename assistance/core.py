@@ -62,6 +62,15 @@ class JarvisAssistant:
                     volume_control("mute")
                 elif "condition" in query:
                     condition()
+            # elif tag == "vulnerable_ports":
+            #     scan_vulnerable_ports()
+            # elif tag == "close_port":
+            #     match = re.search(r'\d+', query)
+            #     if match:
+            #         port = match.group()
+            #         close_port(port)
+            #     else:
+            #         speak("Please specify which port you want me to close.")
             else:
                 speak(response)
                 print("Bot:", response)

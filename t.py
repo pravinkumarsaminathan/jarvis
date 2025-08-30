@@ -1,71 +1,84 @@
-import json
-import torch
-import torch.nn as nn
-from torch.serialization import add_safe_globals
-from sklearn.feature_extraction.text import CountVectorizer
+# from plyer import notification
 
-# -------------------------------
-# Define the tokenizer so unpickling works
-# -------------------------------
-def simple_tokenizer(txt):
-    return txt.split()
+# notification.notify(
+#     title="J.A.R.V.I.S",
+#     message="Sir, I am online. How may I assist you?",
+#     timeout=5
+# )
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QTimer
+import sys, os
 
-# ✅ Allow CountVectorizer to be safely loaded
-add_safe_globals([CountVectorizer])
+class JarvisPopup(QWidget):
+    def __init__(self):
+        super().__init__()
 
-# -----------------------------
-# Load model and preprocessing objects
-# -----------------------------
-data = torch.load("nlp_model/chat_model.pth", weights_only=False)  # ✅ full load
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
+        self.setStyleSheet("background-color: #1a1a2e; border: 2px solid #00ffcc; border-radius: 12px;")
 
-model_state = data["model_state"]
-vectorizer = data["vectorizer"]
-y_labels = data["y_labels"]
+        # Layouts
+        main_layout = QHBoxLayout()
+        text_layout = QVBoxLayout()
 
-input_size = data["input_dim"]
-hidden_size = data["hidden_dim"]
-output_size = data["output_dim"]
+        # Avatar / Logo
+        logo = QLabel()
+        logo_path = "data/jarvis_logo.png"
+        if os.path.exists(logo_path):
+            pixmap = QPixmap(logo_path).scaled(60, 60, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            logo.setPixmap(pixmap)
+        else:
+            logo.setText("🤖")  # fallback emoji if logo missing
+            logo.setStyleSheet("font-size: 28px; color: #00ffcc;")
 
-class ChatModel(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super(ChatModel, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_size, output_size)
+        # Message text
+        text = QLabel("Sir, I am online.<br>How may I assist you?")
+        text.setStyleSheet("color: #00ffcc; font-size: 16px; font-family: Consolas;")
 
-    def forward(self, x):
-        out = self.fc1(x)
-        out = self.relu(out)
-        out = self.fc2(out)
-        return out
+        # Buttons
+        btn_layout = QHBoxLayout()
 
-# Load model
-model = ChatModel(input_size, hidden_size, output_size)
-model.load_state_dict(model_state)
-model.eval()
+        click_btn = QPushButton("Click me")
+        click_btn.setStyleSheet("background-color: #16213e; color: #00ffcc; font-size: 14px; border-radius: 8px; padding: 6px;")
+        click_btn.clicked.connect(self.on_click)
 
-# -----------------------------
-# Chat loop
-# -----------------------------
-with open("data/intents.json") as file:
-    intents = json.load(file)
+        dismiss_btn = QPushButton("Dismiss")
+        dismiss_btn.setStyleSheet("background-color: #16213e; color: #ff4c4c; font-size: 14px; border-radius: 8px; padding: 6px;")
+        dismiss_btn.clicked.connect(self.close)
 
-print("Chatbot is ready! Type 'quit' to exit.")
+        btn_layout.addWidget(click_btn)
+        btn_layout.addWidget(dismiss_btn)
 
-while True:
-    sentence = input("You: ")
-    if sentence.lower() == "quit":
-        break
+        # Arrange layouts
+        text_layout.addWidget(text)
+        text_layout.addLayout(btn_layout)
+        main_layout.addWidget(logo)
+        main_layout.addLayout(text_layout)
+        self.setLayout(main_layout)
 
-    X = vectorizer.transform([sentence]).toarray()
-    X = torch.tensor(X, dtype=torch.float32)
+        # Auto close after 10s
+        QTimer.singleShot(10000, self.close)
 
-    output = model(X)
-    _, predicted = torch.max(output, dim=1)
+        # Position bottom-right
+        screen = QApplication.primaryScreen().availableGeometry()
+        self.move(screen.width() - 320, screen.height() - 140)
+        self.resize(300, 120)
 
-    tag = y_labels[predicted.item()]
+    def on_click(self):
+        print("🔔 JARVIS: Button Clicked!")
+        self.close()
 
-    for intent in intents['intents']:
-        if tag == intent["tag"]:
-            print("Bot:", intent["responses"][0])
-            print(tag)
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    popup = JarvisPopup()
+    popup.show()
+
+    # When popup closes, quit app properly
+    popup.destroyed.connect(app.quit)
+
+    sys.exit(app.exec_())
+
+
+
+
+

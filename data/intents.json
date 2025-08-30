@@ -73,7 +73,7 @@
                 ""
             ]
         },
-        
+
         {
             "tag": "jokes",
             "patterns": [
@@ -160,9 +160,9 @@
         {
             "tag": "insult",
             "patterns": [
-                
+
                 "you are dumb",
-                
+
                 "shut up",
                 "idiot"
             ],
@@ -193,7 +193,7 @@
                 "Yeah!"
             ]
         },
-        
+
         {
             "tag": "appreciate",
             "patterns": [
@@ -252,7 +252,7 @@
         {
             "tag": "open_app_control",
             "patterns": [
-                "open google",                
+                "open google",
                 "open whatsapp",
                 "open instagram",
                 "open youtube",
@@ -304,6 +304,35 @@
                 "Okay, doing that.",
                 "Done Boss!"
             ]
+        },
+        {
+            "tag": "vulnerable_ports",
+            "patterns": [
+                "What are my vulnerable ports",
+                "Scan my system ports",
+                "Check for open ports",
+                "List the vulnerable ports",
+                "Show me the ports that are open"
+            ],
+            "responses": [
+                "Sure, let me check the system ports for vulnerabilities."
+            ],
+            "context": [""]
+        },
+        {
+            "tag": "close_port",
+            "patterns": [
+                "Close port 8080",
+                "Block port 22",
+                "Stop port 3306",
+                "Deny port 443",
+                "Shut down port 5000"
+            ],
+            "responses": [
+                "Okay, I will block that port."
+            ],
+            "context": [""]
         }
+
     ]
-}
+} 
