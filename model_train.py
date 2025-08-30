@@ -107,5 +107,5 @@ data = {
     "y_labels": y_labels
 }
 
-torch.save(data, "chat_model.pth")
+torch.save(data, "nlp_model/chat_model.pth")
 print("Training complete. Model saved as chat_model.pth")

@@ -20,7 +20,7 @@ add_safe_globals([CountVectorizer])
 # -----------------------------
 # Load model and preprocessing objects
 # -----------------------------
-data = torch.load("greeting.pth", weights_only=False)  # ✅ full load
+data = torch.load("nlp_model/greeting.pth", weights_only=False)  # ✅ full load
 
 model_state = data["model_state"]
 vectorizer = data["vectorizer"]
