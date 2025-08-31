@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
-from PySide6.QtGui import QPainter, QFont, QLinearGradient, QColor, QPainterPath, QRadialGradient, QConicalGradient
+from PySide6.QtGui import QPainter, QFont, QLinearGradient, QColor, QPainterPath, QRadialGradient, QConicalGradient, QPen, QBrush
 
 from pynput import keyboard, mouse
 
@@ -105,7 +105,7 @@ class PerimeterGlow(QtWidgets.QWidget):
         grad.setColorAt(0.65, QColor(255, 255, 255, int(alpha * 0.6)))  # white
         grad.setColorAt(1.00, QColor(0, 0, 0, 0))
         p.fillRect(0, 0, w, h, grad)
-        p.end()
+        #p.end()
 
 # ==========================
 # Glass Panel (main window)
@@ -134,67 +134,67 @@ class GlassPanel(QtWidgets.QWidget):
         p.setRenderHint(QPainter.Antialiasing)
         w, h = self.width(), self.height()
         cx, cy = w // 2, h // 2
-        size = min(w, h) - 16
-        r = 32
-        import math
-
         phase = self._anim_phase
 
-        # ----------------------------
-        # Base Glass Shape
-        # ----------------------------
-        path = QtGui.QPainterPath()
-        if self.listening:
-            path.addEllipse(8, 8, size, size)
-        else:
-            path.addRoundedRect(8, 8, w - 16, h - 16, r, r)
+        # ---------------------------
+        # Settings
+        # ---------------------------
+        border_width = 6
+        r = 28
 
-        # Black frosted glass base
-        glass_grad = QtGui.QLinearGradient(0, 0, 0, h)
-        glass_grad.setColorAt(0.0, QColor(25, 25, 35, 220))
-        glass_grad.setColorAt(1.0, QColor(10, 10, 20, 200))
+        # Compute inset for the path so stroke stays fully inside
+        inset = border_width / 2
+        inner_w = w - 2 * inset
+        inner_h = h - 2 * inset
+
+        # ---------------------------
+        # Box Path (fully inset)
+        # ---------------------------
+        path = QPainterPath()
+        if self.listening:
+            size = min(inner_w, inner_h)
+            path.addEllipse(inset, inset, size, size)
+            grad = QConicalGradient(cx, cy, -phase * 360)
+        else:
+            path.addRoundedRect(inset, inset, inner_w, inner_h, r, r)
+            grad = QConicalGradient(cx, cy, -phase * 360)
+
+        # ---------------------------
+        # Glass Core
+        # ---------------------------
+        glass_grad = QLinearGradient(0, 0, 0, h)
+        glass_grad.setColorAt(0.0, QColor(20, 20, 25, 240))
+        glass_grad.setColorAt(1.0, QColor(5, 5, 10, 220))
         p.setPen(Qt.NoPen)
         p.setBrush(glass_grad)
         p.drawPath(path)
 
-        # Depth shadow behind
-        shadow_color = QColor(0, 0, 0, 100)
-        for i in range(6, 0, -1):
-            p.setBrush(shadow_color)
-            p.drawPath(path.translated(i, i))
+        # ---------------------------
+        # Snake Border (curved head only)
+        # ---------------------------
+        grad.setColorAt(0.00, QColor(0, 255, 255, 255))
+        grad.setColorAt(0.05, QColor(120, 80, 255, 220))
+        grad.setColorAt(0.10, QColor(255, 0, 200, 180))
+        grad.setColorAt(0.18, QColor(255, 200, 80, 140))
+        grad.setColorAt(0.35, QColor(0, 0, 0, 0))
+        grad.setColorAt(1.00, QColor(0, 0, 0, 0))
 
-        # ----------------------------
-        # Liquid Flow Border
-        # ----------------------------
-        if self.listening:
-            border_grad = QtGui.QConicalGradient(cx, cy, -phase * 360)
-        else:
-            border_grad = QtGui.QLinearGradient(0, 0, w, h)
-
-        colors = [
-            (0.0, QColor(0, 200, 255, 200)),   # cyan
-            (0.25, QColor(180, 80, 255, 200)), # violet
-            (0.5, QColor(255, 100, 180, 200)), # pink
-            (0.75, QColor(255, 200, 120, 200)),# gold
-            (1.0, QColor(0, 200, 255, 200)),   # loop
-        ]
-        for stop, col in colors:
-            border_grad.setColorAt((stop + phase) % 1.0, col)
-
-        pen = QtGui.QPen(QtGui.QBrush(border_grad), 5)
-        pen.setCapStyle(Qt.RoundCap)
+        pen = QPen(QBrush(grad), border_width)
+        pen.setCapStyle(Qt.RoundCap)   # curved head
+        pen.setJoinStyle(Qt.RoundJoin)
         p.setPen(pen)
         p.setBrush(Qt.NoBrush)
         p.drawPath(path)
 
-        # ----------------------------
-        # Inner Glass Highlight
-        # ----------------------------
-        highlight_grad = QtGui.QLinearGradient(0, 0, w, h)
-        highlight_grad.setColorAt(0.0, QColor(255, 255, 255, 60))
-        highlight_grad.setColorAt(1.0, QColor(255, 255, 255, 10))
-        inner_pen = QtGui.QPen(QtGui.QBrush(highlight_grad), 2)
-        p.setPen(inner_pen)
+        # ---------------------------
+        # Inner Glow (optional)
+        # ---------------------------
+        inner_grad = QRadialGradient(cx, cy, min(inner_w, inner_h) // 1.2)
+        inner_grad.setColorAt(0.0, QColor(100, 200, 255, 35))
+        inner_grad.setColorAt(0.5, QColor(180, 120, 255, 25))
+        inner_grad.setColorAt(1.0, QColor(0, 0, 0, 0))
+        p.setBrush(inner_grad)
+        p.setPen(Qt.NoPen)
         p.drawPath(path)
 
 
@@ -276,15 +276,18 @@ class Equalizer(QtWidgets.QWidget):
 # Main overlay window with animations
 # ==========================
 class JarvisOverlay(QtWidgets.QWidget):
-    def __init__(self, bridge: Bridge, glow: PerimeterGlow):
+    def __init__(self, bridge: Bridge, glow: PerimeterGlow, click_catcher):
         super().__init__()
         self.glow = glow
+        self.click_catcher = click_catcher
         self.setWindowFlags(
             Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint | Qt.X11BypassWindowManagerHint
         )
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.resize(CFG.overlay_width, CFG.overlay_height)
         self._center_on_screen()
+
+        self.installEventFilter(self)
 
         self.panel = GlassPanel(self)
         self.title = QtWidgets.QLabel("Jarvis", self)
@@ -296,6 +299,11 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.subtitle.setAlignment(Qt.AlignHCenter)
         self.subtitle.setFont(QFont("SF Pro Text", 11))
         self.subtitle.setStyleSheet("color: rgba(255,255,255,0.85);")  # light text
+
+        self.logo = QtWidgets.QLabel(self)
+        self.logo.setAlignment(Qt.AlignHCenter)
+        self.logo.setPixmap(QtGui.QPixmap("data/jarvis_logo.png").scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+
 
         self.input = QtWidgets.QLineEdit(self)
         self.input.setPlaceholderText("Type your command… and press Enter")
@@ -314,7 +322,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.eq = Equalizer(self)
         self.eq.setFixedHeight(72)
 
-        self.mic_hint = QtWidgets.QLabel("Listening…", self)
+        self.mic_hint = QtWidgets.QLabel("…", self)
         self.mic_hint.setAlignment(Qt.AlignHCenter)
         self.mic_hint.setFont(QFont("SF Pro Text", 12, QFont.DemiBold))
         self.mic_hint.setStyleSheet("color: #00ffff;")  # cyan for visibility
@@ -328,11 +336,14 @@ class JarvisOverlay(QtWidgets.QWidget):
         inner = QtWidgets.QVBoxLayout(self.panel)
         inner.setContentsMargins(36, 24, 36, 24)
         inner.setSpacing(10)
+        inner.addWidget(self.logo, alignment=Qt.AlignHCenter)
         inner.addWidget(self.title, alignment=Qt.AlignHCenter)
+        #inner.addWidget(self.eq, alignment=Qt.AlignHCenter)
         inner.addWidget(self.subtitle, alignment=Qt.AlignHCenter)
         inner.addWidget(self.eq, alignment=Qt.AlignHCenter)
         inner.addWidget(self.input, alignment=Qt.AlignHCenter)
         inner.addWidget(self.mic_hint, alignment=Qt.AlignHCenter)
+        #inner.addWidget(self.eq, alignment=Qt.AlignHCenter)
 
         self._listening = False
         self._audio_stream = None
@@ -363,6 +374,7 @@ class JarvisOverlay(QtWidgets.QWidget):
 
     def show_overlay(self):
         # show overlay with slide-down animation (no glow here)
+        self.click_catcher.show()
         self.show()
         self.raise_()
         self.activateWindow()
@@ -397,6 +409,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         def after():
             self._stop_listening()
             self.hide()
+            self.click_catcher.hide()
 
         self._close_anim.finished.connect(after)
         self._close_anim.start()
@@ -416,6 +429,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         self._center_on_screen()
         self.eq.set_listening(True)
         self.mic_hint.show()
+        self.input.hide()
         self.subtitle.setText("Listening — say something…")
         self.glow.show_glow()
         if sd is not None and np is not None:
@@ -430,6 +444,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         self._center_on_screen()
         self.eq.set_listening(False)
         self.mic_hint.hide()
+        self.input.show()
         self.subtitle.setText("Ready • Double-press CTRL to open")
         self._stop_audio_capture()
         self.glow.set_intensity(0.0)
@@ -484,6 +499,42 @@ class JarvisOverlay(QtWidgets.QWidget):
     def is_active(self):
         # Returns True if overlay is visible and centered (active)
         return self.isVisible()
+    
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.MouseButtonPress:
+            # Get click position in overlay coordinates
+            pos = event.position() if hasattr(event, "position") else event.localPos()
+            x, y = int(pos.x()), int(pos.y())
+            w, h = self.width(), self.height()
+            r = 28  # Same as your GlassPanel corner radius
+
+            # If listening, use circle hit test
+            if self._listening:
+                cx, cy = w // 2, h // 2
+                radius = min(w, h) // 2
+                if (x - cx) ** 2 + (y - cy) ** 2 <= radius ** 2:
+                    return True  # Click inside circle, do nothing
+
+            # Otherwise, use rounded rectangle hit test
+            else:
+                rect = QtCore.QRect(0, 0, w, h)
+                # Check if inside rounded rect (approximate: inside main rect minus corners)
+                if rect.contains(x, y):
+                    # Check if in corner
+                    if (x < r and y < r and (x - r) ** 2 + (y - r) ** 2 > r ** 2) or \
+                    (x > w - r and y < r and (x - (w - r)) ** 2 + (y - r) ** 2 > r ** 2) or \
+                    (x < r and y > h - r and (x - r) ** 2 + (y - (h - r)) ** 2 > r ** 2) or \
+                    (x > w - r and y > h - r and (x - (w - r)) ** 2 + (y - (h - r)) ** 2 > r ** 2):
+                        pass  # In transparent corner, treat as outside
+                    else:
+                        return True  # Click inside rounded rect, do nothing
+
+            # Otherwise, treat as outside click
+            if CFG.hide_on_any_click and self.isVisible():
+                self.hide_overlay()
+                return True  # Event handled
+
+        return super().eventFilter(obj, event)
 
 # ==========================
 # Global input listeners (pynput)
@@ -510,7 +561,6 @@ class GlobalListeners(threading.Thread):
                         self._last_ctrl_time = now
                     self._ctrl_pressed = True
                 elif key == keyboard.KeyCode.from_char('s') and self._ctrl_pressed:
-                    # Only trigger if overlay is active
                     if self.overlay.is_active():
                         self.bridge.start_listening.emit()
             except Exception:
@@ -526,16 +576,9 @@ class GlobalListeners(threading.Thread):
             except Exception:
                 pass
 
-        def on_click(x, y, button, pressed):
-            if pressed:
-                self.bridge.outside_click.emit()
-
         self._keyboard_listener = keyboard.Listener(on_press=on_press, on_release=on_release)
-        self._mouse_listener = mouse.Listener(on_click=on_click)
         self._keyboard_listener.start()
-        self._mouse_listener.start()
         self._keyboard_listener.join()
-        self._mouse_listener.join()
 
 # ==========================
 # App bootstrap
@@ -550,7 +593,9 @@ class App(QtWidgets.QApplication):
 
         self.bridge = Bridge()
         self.glow = PerimeterGlow()
-        self.overlay = JarvisOverlay(self.bridge, self.glow)
+        self.click_catcher = ClickCatcher(None)  # Pass None for now
+        self.overlay = JarvisOverlay(self.bridge, self.glow, self.click_catcher)
+        self.click_catcher.overlay = self.overlay  # Set overlay reference after creation
 
         # tray
         self.tray = QtWidgets.QSystemTrayIcon(QtGui.QIcon("data/jarvis_logo.png"))
@@ -567,6 +612,29 @@ class App(QtWidgets.QApplication):
         self.listeners = GlobalListeners(self.bridge, self.overlay) #Pass overlay
         self.listeners.start()
 
+
+class ClickCatcher(QtWidgets.QWidget):
+    def __init__(self, overlay: QtWidgets.QWidget):
+        super().__init__()
+        self.overlay = overlay
+        self.setWindowFlags(
+            Qt.FramelessWindowHint | Qt.Tool | Qt.WindowStaysOnTopHint | Qt.X11BypassWindowManagerHint
+        )
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_ShowWithoutActivating)
+        self.setGeometry(QtGui.QGuiApplication.primaryScreen().geometry())
+        self.hide()
+
+    def mousePressEvent(self, event):
+        # If click is outside overlay, hide overlay
+        overlay_rect = self.overlay.geometry()
+        overlay_pos = self.overlay.mapToGlobal(self.overlay.rect().topLeft())
+        overlay_global_rect = QtCore.QRect(overlay_pos, self.overlay.size())
+        if not overlay_global_rect.contains(event.globalPosition().toPoint()):
+            self.overlay.hide_overlay()
+            self.hide()
+        else:
+            event.ignore()
 
 def main():
     app = App(sys.argv)
