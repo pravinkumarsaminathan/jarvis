@@ -133,130 +133,73 @@ class GlassPanel(QtWidgets.QWidget):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         w, h = self.width(), self.height()
+        cx, cy = w // 2, h // 2
+        size = min(w, h) - 16
+        r = 32
+        import math
 
-        gradient_stops = [
-            (0.00, QColor(0, 200, 255, 220)),    # blue
-            (0.33, QColor(120, 0, 255, 220)),    # purple
-            (0.66, QColor(255, 0, 255, 220)),    # magenta
-            (1.00, QColor(0, 200, 255, 220)),    # blue (wrap)
-        ]
         phase = self._anim_phase
 
-        import math
-        pulse = 0.5 + 0.5 * math.sin(phase * 2 * math.pi)
-        border_base = 2 + int(1 * pulse)
-        glow_layers = 8
-        glow_strength = 0.18 + 0.10 * pulse
-
+        # ----------------------------
+        # Base Glass Shape
+        # ----------------------------
+        path = QtGui.QPainterPath()
         if self.listening:
-            size = min(w, h) - 16
-            cx, cy = w // 2, h // 2
-
-            # Drop shadow
-            shadow_color = QColor(0, 0, 0, 80)
-            for i in range(7, 0, -1):
-                p.setPen(Qt.NoPen)
-                p.setBrush(shadow_color)
-                p.drawEllipse(cx - size // 2 - i, cy - size // 2 - i, size + 2 * i, size + 2 * i)
-
-            # Glassy dark background
-            grad = QRadialGradient(cx, cy, size // 2)
-            grad.setColorAt(0.0, QColor(40, 40, 60, 220))
-            grad.setColorAt(1.0, QColor(10, 10, 20, 200))
-            p.setBrush(grad)
-            p.setPen(Qt.NoPen)
-            p.drawEllipse(cx - size // 2, cy - size // 2, size, size)
-
-            # Subtle frosted overlay
-            overlay = QColor(60, 60, 80, 80)
-            p.setBrush(overlay)
-            p.drawEllipse(cx - size // 2, cy - size // 2, size, size)
-
-            # --- Dynamic Island/Siri Glow Border Effect ---
-            for g in range(glow_layers, 0, -1):
-                width = border_base + g * 1.5
-                alpha_scale = glow_strength * (g / glow_layers)
-                border_grad = QConicalGradient(cx, cy, -phase * 360)
-                for stop, color in gradient_stops:
-                    c = QColor(color)
-                    c.setAlphaF(alpha_scale)
-                    border_grad.setColorAt(stop, c)
-                pen = QtGui.QPen(QtGui.QBrush(border_grad), width)
-                pen.setCapStyle(Qt.RoundCap)
-                p.setPen(pen)
-                p.setBrush(Qt.NoBrush)
-                p.drawEllipse(
-                    cx - size // 2 + width // 2,
-                    cy - size // 2 + width // 2,
-                    size - width,
-                    size - width
-                )
-            # Final sharp ring, but with a soft gradient
-            border_grad = QConicalGradient(cx, cy, -phase * 360)
-            for stop, color in gradient_stops:
-                border_grad.setColorAt(stop, color)
-            pen = QtGui.QPen(QtGui.QBrush(border_grad), border_base)
-            pen.setCapStyle(Qt.RoundCap)
-            p.setPen(pen)
-            p.setBrush(Qt.NoBrush)
-            p.drawEllipse(
-                cx - size // 2 + border_base // 2,
-                cy - size // 2 + border_base // 2,
-                size - border_base,
-                size - border_base
-            )
+            path.addEllipse(8, 8, size, size)
         else:
-            r = 32
-            shadow_color = QColor(0, 0, 0, 80)
-            for i in range(7, 0, -1):
-                p.setPen(Qt.NoPen)
-                p.setBrush(shadow_color)
-                p.drawRoundedRect(8 - i, 8 - i, w - 16 + 2 * i, h - 16 + 2 * i, r + i, r + i)
+            path.addRoundedRect(8, 8, w - 16, h - 16, r, r)
 
-            grad = QLinearGradient(0, 0, 0, h)
-            grad.setColorAt(0.0, QColor(30, 30, 40, 230))
-            grad.setColorAt(1.0, QColor(10, 10, 20, 200))
-            p.setBrush(grad)
-            p.setPen(Qt.NoPen)
-            p.drawRoundedRect(8, 8, w - 16, h - 16, r, r)
+        # Black frosted glass base
+        glass_grad = QtGui.QLinearGradient(0, 0, 0, h)
+        glass_grad.setColorAt(0.0, QColor(25, 25, 35, 220))
+        glass_grad.setColorAt(1.0, QColor(10, 10, 20, 200))
+        p.setPen(Qt.NoPen)
+        p.setBrush(glass_grad)
+        p.drawPath(path)
 
-            overlay = QColor(60, 60, 80, 80)
-            p.setBrush(overlay)
-            p.drawRoundedRect(8, 8, w - 16, h - 16, r, r)
+        # Depth shadow behind
+        shadow_color = QColor(0, 0, 0, 100)
+        for i in range(6, 0, -1):
+            p.setBrush(shadow_color)
+            p.drawPath(path.translated(i, i))
 
-            # --- Ultra-thin border in rectangle mode ---
-            border_base_rect = 0.2  # ultra-thin
-            for g in range(glow_layers, 0, -1):
-                width = border_base_rect + g * 0.4  # even thinner glow
-                alpha_scale = glow_strength * (g / glow_layers)
-                border_grad = QLinearGradient(8, 8, w - 8, 8)
-                for stop, color in gradient_stops:
-                    shifted = (stop + phase) % 1.0
-                    c = QColor(color)
-                    c.setAlphaF(alpha_scale)
-                    border_grad.setColorAt(shifted, c)
-                for stop, color in gradient_stops:
-                    shifted = (stop + phase + 1.0) % 1.0
-                    c = QColor(color)
-                    c.setAlphaF(alpha_scale)
-                    border_grad.setColorAt(shifted, c)
-                pen = QtGui.QPen(QtGui.QBrush(border_grad), width)
-                pen.setCapStyle(Qt.RoundCap)
-                p.setPen(pen)
-                p.setBrush(Qt.NoBrush)
-                p.drawRoundedRect(8, 8, w - 16, h - 16, r, r)
-            border_grad = QLinearGradient(8, 8, w - 8, 8)
-            for stop, color in gradient_stops:
-                shifted = (stop + phase) % 1.0
-                border_grad.setColorAt(shifted, color)
-            for stop, color in gradient_stops:
-                shifted = (stop + phase + 1.0) % 1.0
-                border_grad.setColorAt(shifted, color)
-            pen = QtGui.QPen(QtGui.QBrush(border_grad), border_base_rect)
-            pen.setCapStyle(Qt.RoundCap)
-            p.setPen(pen)
-            p.setBrush(Qt.NoBrush)
-            p.drawRoundedRect(8, 8, w - 16, h - 16, r, r)
+        # ----------------------------
+        # Liquid Flow Border
+        # ----------------------------
+        if self.listening:
+            border_grad = QtGui.QConicalGradient(cx, cy, -phase * 360)
+        else:
+            border_grad = QtGui.QLinearGradient(0, 0, w, h)
+
+        colors = [
+            (0.0, QColor(0, 200, 255, 200)),   # cyan
+            (0.25, QColor(180, 80, 255, 200)), # violet
+            (0.5, QColor(255, 100, 180, 200)), # pink
+            (0.75, QColor(255, 200, 120, 200)),# gold
+            (1.0, QColor(0, 200, 255, 200)),   # loop
+        ]
+        for stop, col in colors:
+            border_grad.setColorAt((stop + phase) % 1.0, col)
+
+        pen = QtGui.QPen(QtGui.QBrush(border_grad), 5)
+        pen.setCapStyle(Qt.RoundCap)
+        p.setPen(pen)
+        p.setBrush(Qt.NoBrush)
+        p.drawPath(path)
+
+        # ----------------------------
+        # Inner Glass Highlight
+        # ----------------------------
+        highlight_grad = QtGui.QLinearGradient(0, 0, w, h)
+        highlight_grad.setColorAt(0.0, QColor(255, 255, 255, 60))
+        highlight_grad.setColorAt(1.0, QColor(255, 255, 255, 10))
+        inner_pen = QtGui.QPen(QtGui.QBrush(highlight_grad), 2)
+        p.setPen(inner_pen)
+        p.drawPath(path)
+
+
+
+
 
 # ==========================
 # Equalizer with level signal
@@ -538,13 +481,18 @@ class JarvisOverlay(QtWidgets.QWidget):
         scaled = min(1.0, max(0.02, level * 1.6))
         self.glow.set_intensity(scaled)
 
+    def is_active(self):
+        # Returns True if overlay is visible and centered (active)
+        return self.isVisible()
+
 # ==========================
 # Global input listeners (pynput)
 # ==========================
 class GlobalListeners(threading.Thread):
-    def __init__(self, bridge: Bridge):
+    def __init__(self, bridge: Bridge, overlay: JarvisOverlay):
         super().__init__(daemon=True)
         self.bridge = bridge
+        self.overlay = overlay
         self._last_ctrl_time = 0
         self._ctrl_pressed = False
         self._keyboard_listener = None
@@ -562,7 +510,9 @@ class GlobalListeners(threading.Thread):
                         self._last_ctrl_time = now
                     self._ctrl_pressed = True
                 elif key == keyboard.KeyCode.from_char('s') and self._ctrl_pressed:
-                    self.bridge.start_listening.emit()
+                    # Only trigger if overlay is active
+                    if self.overlay.is_active():
+                        self.bridge.start_listening.emit()
             except Exception:
                 pass
 
@@ -571,7 +521,8 @@ class GlobalListeners(threading.Thread):
                 if key in (keyboard.Key.ctrl, keyboard.Key.ctrl_l, keyboard.Key.ctrl_r):
                     self._ctrl_pressed = False
                 if key == keyboard.KeyCode.from_char('s'):
-                    self.bridge.stop_listening.emit()
+                    if self.overlay.is_active():
+                        self.bridge.stop_listening.emit()
             except Exception:
                 pass
 
@@ -613,7 +564,7 @@ class App(QtWidgets.QApplication):
         self.tray.setVisible(True)
 
         # start listeners
-        self.listeners = GlobalListeners(self.bridge)
+        self.listeners = GlobalListeners(self.bridge, self.overlay) #Pass overlay
         self.listeners.start()
 
 
