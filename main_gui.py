@@ -295,7 +295,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.title.setFont(QFont("SF Pro Text", 20, QFont.DemiBold))
         self.title.setStyleSheet("color: #fff;")  # white text
 
-        self.subtitle = QtWidgets.QLabel("Ready • Double-press CTRL to open", self)
+        self.subtitle = QtWidgets.QLabel("           Press CTRL+S to Speak           ", self)
         self.subtitle.setAlignment(Qt.AlignHCenter)
         self.subtitle.setFont(QFont("SF Pro Text", 11))
         self.subtitle.setStyleSheet("color: rgba(255,255,255,0.85);")  # light text
@@ -372,6 +372,13 @@ class JarvisOverlay(QtWidgets.QWidget):
         y = int((screen.height() - self.height()) / 2)
         self.move(x, y)
 
+    # def _center_on_screen(self):
+    #     screen = QtGui.QGuiApplication.primaryScreen().geometry()
+    #     x = int((screen.width() - self.width()) / 2)
+    #     y = int(screen.height() * 0.12)   # mid-top (12% from top)
+    #     self.move(x, y)
+
+
     def show_overlay(self):
         # show overlay with slide-down animation (no glow here)
         self.click_catcher.show()
@@ -445,7 +452,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.eq.set_listening(False)
         self.mic_hint.hide()
         self.input.show()
-        self.subtitle.setText("Ready • Double-press CTRL to open")
+        self.subtitle.setText("          Press CTRL+S to Speak          ")
         self._stop_audio_capture()
         self.glow.set_intensity(0.0)
         self.glow.hide_glow()  # Hide glow when mic stops
