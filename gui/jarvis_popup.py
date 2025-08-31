@@ -1,7 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QApplication
-from PyQt5.QtGui import QPixmap, QFont, QColor, QPainter, QBrush
-from PyQt5.QtCore import Qt, QTimer
-
+from PySide6.QtWidgets import QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QApplication
+from PySide6.QtGui import QPixmap, QFont, QColor, QPainter, QBrush
+from PySide6.QtCore import Qt, QTimer
 
 class JarvisPopup(QWidget):
     def __init__(self, message, logo_path=None, timeout=5000):
@@ -76,7 +75,7 @@ class JarvisPopup(QWidget):
 
         # Size & position bottom-right
         self.resize(320, 220)
-        screen_geo = QApplication.desktop().availableGeometry()
+        screen_geo = QApplication.primaryScreen().availableGeometry()
         x = screen_geo.width() - self.width() - 30
         y = screen_geo.height() - self.height() - 50
         self.move(x, y)

@@ -1,5 +1,6 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, Qt
+from PySide6.QtCore import Signal
 from .glass_panel import GlassPanel
 from .perimeter_glow import PerimeterGlow
 from .equalizer import Equalizer
@@ -7,10 +8,38 @@ from .click_catcher import ClickCatcher
 from bridge import Bridge
 import sounddevice as sd
 import numpy as np
+from assistance.core import JarvisAssistant
+import threading
+import speech_recognition as sr
+from PySide6.QtCore import Slot
+
 
 class JarvisOverlay(QtWidgets.QWidget):
+    mic_hint_update = Signal(str)
+    input_update = Signal(str)
+    stop_listening_signal = Signal()
+    subtitle_update = Signal(str)
+    reset_subtitle_signal = Signal()
+
+    @Slot(str)
+    def _set_mic_hint(self, text):
+        self.mic_hint.setText(text)
+
+    @Slot(str)
+    def _set_input_text(self, text):
+        self.input.setText(text)
+
+    @Slot(str)
+    def _set_subtitle(self, text):
+        self.subtitle.setText(text)
+
+    @Slot()
+    def _reset_subtitle_later(self):
+        QtCore.QTimer.singleShot(3000, lambda: self.subtitle.setText("           Press CTRL+S to Speak           "))
+
     def __init__(self, bridge: Bridge, glow: PerimeterGlow, click_catcher: ClickCatcher):
         super().__init__()
+        self.assistant = JarvisAssistant()
         self.glow = glow
         self._audio_stream = None
         self.click_catcher = click_catcher
@@ -94,6 +123,23 @@ class JarvisOverlay(QtWidgets.QWidget):
         self._close_anim.setDuration(300)
 
         self.hide()
+
+        self._focus_timer = QtCore.QTimer(self)
+        self._focus_timer.timeout.connect(self._ensure_input_focus)
+        self._focus_timer.setInterval(300)  # ms
+
+        self._voice_thread = None
+        self._voice_stop_flag = threading.Event()
+
+        self.mic_hint_update.connect(self.mic_hint.setText)
+        self.input_update.connect(self.input.setText)
+        self.stop_listening_signal.connect(self._stop_listening)
+
+        self._voice_audio = None
+        self._voice_recording = False
+
+        self.subtitle_update.connect(self._set_subtitle)
+        self.reset_subtitle_signal.connect(self._reset_subtitle_later)
     
     def _audio_callback(self, indata, frames, time, status):
         # Example: compute audio level and update equalizer
@@ -115,6 +161,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.activateWindow()
         self.input.setFocus()
         self._center_on_screen()
+        self._focus_timer.start()
 
         screen = QtGui.QGuiApplication.primaryScreen().geometry()
         x = int((screen.width() - self.width()) / 2)
@@ -142,6 +189,7 @@ class JarvisOverlay(QtWidgets.QWidget):
 
         self._close_anim.finished.connect(after)
         self._close_anim.start()
+        self._focus_timer.stop()
 
     def _toggle(self):
         if self.isVisible():
@@ -159,10 +207,14 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.eq.set_listening(True)
         self.mic_hint.show()
         self.input.hide()
-        self.subtitle.setText("Listening — say something…")
+        self.subtitle.setText("Listening — hold CTRL+S and \nspeak")
         self.glow.show_glow()
         if sd is not None and np is not None:
             self._start_audio_capture()
+        # Start recording audio
+        self._voice_stop_flag.clear()
+        self._voice_recording = True
+        threading.Thread(target=self._record_voice, daemon=True).start()
 
     def _stop_listening(self):
         if not self._listening:
@@ -174,10 +226,12 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.eq.set_listening(False)
         self.mic_hint.hide()
         self.input.show()
-        self.subtitle.setText("          Press CTRL+S to Speak          ")
+        self.subtitle_update.emit("Recognizing…")  # Show in rectangle
         self._stop_audio_capture()
         self.glow.set_intensity(0.0)
         self.glow.hide_glow()
+        # Start recognition
+        threading.Thread(target=self._recognize_voice, daemon=True).start()
 
     def _outside_click(self):
         if self.isVisible():
@@ -192,7 +246,10 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.input.clear()
 
     def handle_query(self, text: str):
-        self.subtitle.setText(f"You said: {text}")
+        self.subtitle.setText(f"You said: {text.lower().strip()}")
+        threading.Thread(target=self.assistant.run, args=(text,), daemon=True).start()
+        self.input.show()
+        self._ensure_input_focus()
 
     def _start_audio_capture(self):
         if self._audio_stream is not None:
@@ -244,3 +301,74 @@ class JarvisOverlay(QtWidgets.QWidget):
                 return True
 
         return super().eventFilter(obj, event)
+    
+    def _ensure_input_focus(self):
+        if self.isVisible():
+            self.raise_()
+            self.activateWindow()
+            self.input.setFocus()
+
+    def _voice_input_handler(self):
+        recognizer = sr.Recognizer()
+        mic = sr.Microphone()
+        with mic as source:
+            self.mic_hint_update.emit("Listening…")
+            try:
+                audio = recognizer.listen(source, timeout=5, phrase_time_limit=7)
+                if self._voice_stop_flag.is_set():
+                    self.mic_hint_update.emit("Stopped.")
+                    return
+                self.mic_hint_update.emit("Recognizing…")
+                text = recognizer.recognize_google(audio)
+                if not self._voice_stop_flag.is_set():
+                    self.stop_listening_signal.emit()
+                    self.input_update.emit(text)
+                    self.handle_query(text)
+            except sr.WaitTimeoutError:
+                self.mic_hint_update.emit("Didn't hear anything.")
+                self.stop_listening_signal.emit()
+            except sr.UnknownValueError:
+                self.mic_hint_update.emit("Sorry, I didn't catch that.")
+                self.stop_listening_signal.emit()
+            except Exception as e:
+                self.mic_hint_update.emit(f"Error: {e}")
+                self.stop_listening_signal.emit()
+    
+    def _record_voice(self):
+        recognizer = sr.Recognizer()
+        mic = sr.Microphone()
+        with mic as source:
+            self.mic_hint_update.emit("Listening…")
+            try:
+                # Listen for up to 5 seconds or until silence
+                audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
+                self._voice_audio = audio
+            except Exception as e:
+                self._voice_audio = None
+                self.mic_hint_update.emit(f"Mic error: {e}")
+
+    def _recognize_voice(self):
+        recognizer = sr.Recognizer()
+        audio = self._voice_audio
+        if audio is None:
+            self.mic_hint_update.emit("Didn't hear anything.")
+            self.reset_subtitle_signal.emit()
+            return
+        try:
+            text = recognizer.recognize_google(audio)
+            cleaned = text.strip().lower()
+            if not cleaned:
+                self.subtitle_update.emit("try again...")
+                self.reset_subtitle_signal.emit()
+                return
+            self.handle_query(cleaned)
+            self.reset_subtitle_signal.emit()
+        except sr.UnknownValueError:
+            self.mic_hint_update.emit("Sorry, I didn't catch that.")
+            self.reset_subtitle_signal.emit()
+        except Exception as e:
+            self.mic_hint_update.emit(f"Error: {e}")
+            self.reset_subtitle_signal.emit()
+    
+    def _reset_subtitle_later(self, delay_ms=1200):
+        QtCore.QTimer.singleShot(delay_ms, lambda: self.subtitle_update.emit("           Press CTRL+S to Speak           "))

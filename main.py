@@ -3,36 +3,41 @@ def simple_tokenizer(txt):
 
 import os
 import sys
+import threading
 from time import time, sleep
 from torch.serialization import add_safe_globals
 add_safe_globals([simple_tokenizer])
 
-from assistance.core import JarvisAssistant
-from assistance.utils import wish_me
-
-from gui.popup_manager import PopupManager
-
 gui_app_path = os.path.join(os.path.dirname(__file__), "jarvis_gui_app", "src")
 sys.path.insert(0, gui_app_path)
-# Import the OOP GUI application
-from jarvis_gui_app.src.app import JarvisApp  # Adjust the import path as per your folder structure
 
 # Path to logo inside data folder
 logo_path = os.path.join(os.path.dirname(__file__), "data", "jarvis_logo.png")
 
-def main():
-    # Start the OOP GUI
-    app = JarvisApp()
-    app.run()  # This will start the event loop for your GUI
+from PySide6 import QtWidgets
 
-    # The rest of your logic (if needed)
-    # manager = PopupManager()
-    # manager.show_popup("Sir I am online, How may i assist you!", logo_path=logo_path, timeout=7000)
-    # for i in range(3):
-    #     app.processEvents()
-    #     app.sendPostedEvents(None, 0)
-    #     sleep(1)
-    # wish_me()
+def main():
+    # Create ONE QApplication
+    app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+
+    # Import GUI modules AFTER QApplication is created
+    from gui.popup_manager import PopupManager
+    from jarvis_gui_app.src.app import JarvisApp
+    from assistance.utils import wish_me
+
+    # Pass it to PopupManager
+    manager = PopupManager(app=app)
+    manager.show_popup("Sir I am online, click double CTRL to access me", logo_path=logo_path, timeout=7000)
+    for i in range(3):
+        app.processEvents()
+        app.sendPostedEvents(None, 0)
+        sleep(1)
+
+    # Pass the same app to JarvisApp, or let JarvisApp use the existing instance
+    wish_me()
+    jarvis_app = JarvisApp()
+    jarvis_app.run()
+
     # assistant = JarvisAssistant()
     # assistant.run()
 
