@@ -8,6 +8,9 @@ import json
 import requests
 import speech_recognition as sr
 import nmap
+import wikipedia
+
+OPENWEATHER_API_KEY = "ca8004bcd630a58b8fc39755e6dfb46c"   # replace with your API key
 
 def command():
     r = sr.Recognizer()
@@ -32,13 +35,13 @@ def command():
         os.dup2(old_stderr, 2)
         os.close(devnull)
 
-def speak(text, speed=1.0):
+def speak(text, speed=1.0, voice="en-US-AriaNeural"):
     """
     Stream TTS from local server and play instantly with mpg123.
     """
     payload = {
         "input": text,
-        "voice": "en-US-AriaNeural",
+        "voice": voice,
         "response_format": "mp3",
         "speed": speed
     }
@@ -197,3 +200,85 @@ def volume_control(action):
     elif action == "down":
         os.system("pactl set-sink-volume @DEFAULT_SINK@ -5% > /dev/null 2>&1")
         speak("Volume decreased")
+
+def search_wikipedia(query):
+    try:
+        # Search Wikipedia summary (first 2 sentences)
+        result = wikipedia.summary(query, sentences=2)
+        print(f"\n Wikipedia Result for '{query}':\n{result}\n")
+        speak(result)
+    except wikipedia.exceptions.DisambiguationError as e:
+        speak("Your query is too broad, please be more specific.")
+        print("Disambiguation Error:", e.options[:5])  # show some options
+    except wikipedia.exceptions.PageError:
+        speak("Sorry, I couldn't find anything on Wikipedia for that.")
+    except Exception as e:
+        speak("An error occurred while searching Wikipedia.")
+        print("Error:", e)
+
+def get_weather(query: str) -> str:
+    city = extract_city(query)
+    if not city:
+        return "Please specify a city, like 'weather in chennai today'."
+
+    # detect <when>
+    if "tomorrow" in query:
+        when = "tomorrow"
+    elif "next" in query:
+        when = "forecast"
+    else:
+        when = "today"
+
+    try:
+        if when == "today":
+            url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+            data = requests.get(url).json()
+            if data.get("cod") != 200:
+                return f"Couldn't find weather for {city}."
+            temp = data["main"]["temp"]
+            desc = data["weather"][0]["description"]
+            return f"Today in {city.title()}: {desc}, {temp}°C."
+
+        else:  # tomorrow or forecast
+            url = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+            data = requests.get(url).json()
+            if data.get("cod") != "200":
+                return f"Couldn't get forecast for {city}."
+
+            forecasts = []
+            now = datetime.datetime.now()
+
+            for entry in data["list"]:
+                date_txt = entry["dt_txt"]
+                forecast_date = datetime.datetime.strptime(date_txt, "%Y-%m-%d %H:%M:%S")
+
+                if when == "tomorrow" and forecast_date.date() == (now + datetime.timedelta(days=1)).date():
+                    temp = entry["main"]["temp"]
+                    desc = entry["weather"][0]["description"]
+                    forecasts.append(f"At {forecast_date.strftime('%I %p')}: {desc}, {temp}°C")
+
+                elif when == "forecast" and forecast_date.hour == 12:
+                    temp = entry["main"]["temp"]
+                    desc = entry["weather"][0]["description"]
+                    forecasts.append(f"{forecast_date.strftime('%A')}: {desc}, {temp}°C")
+
+            if forecasts:
+                return f"Weather in {city.title()} ({when}):\n" + "\n".join(forecasts)
+            else:
+                return f"No forecast available for {city}."
+
+    except Exception as e:
+        return f"Error while fetching weather: {str(e)}"
+    
+def extract_city(query: str) -> str:
+    """
+    Extract city name from a query like:
+    'weather in chennai today' -> 'chennai'
+    """
+    if " in " in query:
+        city = query.split(" in ", 1)[1]  # take text after 'in'
+        # remove timing words
+        for w in ["today", "tomorrow", "next", "days", "day"]:
+            city = city.replace(w, "").strip()
+        return city
+    return None

@@ -22,12 +22,17 @@
         "happy birthday message",
         "i want to send a birthday wish",
         "send happy birthday",
-        "happy birthday"
+        "happy birthday",
+        "birthday wishes",
+        "send birthday message"
       ],
       "responses": [
         "Happy Birthday 99999! Have a fantastic year ahead.",
         "Wishing you a very happy birthday!",
-        "Happy Birthday 99999! Hope your day is as special as you are."
+        "Happy Birthday 99999! Hope your day is as special as you are.",
+        "Happy Birthday 99999! , Wishing you all the best!",
+        "Many more happy returns of the day, 99999!",
+        "Happy Birthday 99999! Have a fantastic year ahead!"
       ]
     },
     {
@@ -37,213 +42,276 @@
         "congratulations message",
         "send congratulations",
         "i want to send congratulations",
-        "congratulations"
+        "congratulations",
+        "send congrats",
+        "congrats"
       ],
       "responses": [
         "Congratulations 99999! Well done.",
         "Congrats 99999! Wishing you more success ahead.",
-        "Congratulations 99999 on your achievement!"
+        "Congratulations 99999 on your achievement!",
+        "Congratulations 99999! You truly deserve it.",
+        "Well done 99999! Big congrats on your achievement.",
+        "Congrats 99999! Wishing you more success ahead."
       ]
     },
     {
-      "intents": [
-        {
-          "tag": "morning_message",
-          "patterns": [
-            "message: good morning",
-            "good morning message",
-            "send good morning",
-            "good morning"
-          ],
-          "responses": [
-            "Good Morning 99999! Have a wonderful day ahead!",
-            "Rise and shine, 99999! Good Morning!",
-            "Wishing you a bright and happy morning, 99999!"
-          ]
-        },
-        {
-          "tag": "afternoon_message",
-          "patterns": [
-            "message: good afternoon",
-            "good afternoon message",
-            "send good afternoon",
-            "good afternoon"
-          ],
-          "responses": [
-            "Good Afternoon 99999! Hope your day is going well.",
-            "Good Afternoon 99999, stay positive and energetic!",
-            "Wishing you a refreshing Good Afternoon 99999!"
-          ]
-        },
-        {
-          "tag": "evening_message",
-          "patterns": [
-            "message: good evening",
-            "good evening message",
-            "send good evening",
-            "good evening"
-          ],
-          "responses": [
-            "Good Evening 99999! Relax and enjoy the night.",
-            "Hope you had a productive day, 99999! Good Evening!",
-            "Good Evening 99999, wishing you peace and joy tonight."
-          ]
-        },
-        {
-          "tag": "night_message",
-          "patterns": [
-            "message: good night",
-            "good night message",
-            "send good night",
-            "good night"
-          ],
-          "responses": [
-            "Good Night 99999! Sweet dreams!",
-            "Sleep well, 99999. Have a peaceful night!",
-            "Good Night 99999, may tomorrow be brighter!"
-          ]
-        },
-        {
-          "tag": "birthday_message",
-          "patterns": [
-            "message: happy birthday",
-            "birthday wishes",
-            "send birthday message",
-            "happy birthday"
-          ],
-          "responses": [
-            "Happy Birthday 99999! , Wishing you all the best!",
-            "Many more happy returns of the day, 99999!",
-            "Happy Birthday 99999! Have a fantastic year ahead!"
-          ]
-        },
-        {
-          "tag": "festival_message",
-          "patterns": [
-            "message: happy diwali",
-            "diwali wishes",
-            "pongal wishes",
-            "happy new year",
-            "christmas wishes"
-          ],
-          "responses": [
-            "Happy Diwali 99999! May your life be filled with lights and joy.",
-            "Wishing you and your family a very Happy Pongal, 99999!",
-            "Merry Christmas 99999! , May your holiday season be full of happiness.",
-            "Happy New Year 99999! , May this year bring success and smiles!"
-          ]
-        },
-        {
-          "tag": "congratulations_message",
-          "patterns": [
-            "message: congratulations",
-            "send congrats",
-            "congratulations message",
-            "congrats"
-          ],
-          "responses": [
-            "Congratulations 99999! You truly deserve it.",
-            "Well done 99999! Big congrats on your achievement.",
-            "Congrats 99999! Wishing you more success ahead."
-          ]
-        },
-        {
-          "tag": "thankyou_message",
-          "patterns": [
-            "message: thank you",
-            "send thanks",
-            "thank you message",
-            "thanks"
-          ],
-          "responses": [
-            "Thank you 99999! You're the best.",
-            "Thanks a lot 99999, really appreciate it!",
-            "Many thanks 99999! Your kindness means a lot."
-          ]
-        },
-        {
-          "tag": "sorry_message",
-          "patterns": [
-            "message: sorry",
-            "apology message",
-            "send sorry",
-            "forgive me"
-          ],
-          "responses": [
-            "I'm really sorry 99999, please forgive me.",
-            "Sorry 99999, it won’t happen again.",
-            "Apologies 99999, I didn’t mean to hurt you."
-          ]
-        },
-        {
-          "tag": "friendship_message",
-          "patterns": [
-            "message: friendship",
-            "send friendship message",
-            "best friend wishes",
-            "friendship day"
-          ],
-          "responses": [
-            "A true friend like you is a blessing, 99999!",
-            "Friendship is the purest bond , Thank you 99999!",
-            "Happy Friendship Day 99999! You're awesome."
-          ]
-        },
-        {
-          "tag": "love_message",
-          "patterns": [
-            "message: love",
-            "send love message",
-            "i love you"
-          ],
-          "responses": [
-            "I love you 99999 ",
-            "Love you to the moon and back, 99999!",
-            "99999, you mean the world to me "
-          ]
-        },
-        {
-          "tag": "motivational_message",
-          "patterns": [
-            "message: motivation",
-            "send motivational message",
-            "inspiration",
-            "motivational quote"
-          ],
-          "responses": [
-            "Believe in yourself, 99999! You can do it.",
-            "Success comes to those who never give up. Keep going 99999!",
-            "Stay positive and strong, 99999. Your hard work will pay off!"
-          ]
-        },
-        {
-          "tag": "getwell_message",
-          "patterns": [
-            "message: get well soon",
-            "send recovery wishes",
-            "sick message",
-            "feel better"
-          ],
-          "responses": [
-            "Get well soon 99999! Wishing you a speedy recovery.",
-            "Take care 99999, your health is most important.",
-            "Sending healing vibes your way, 99999. Get well soon!"
-          ]
-        },
-        {
-          "tag": "bestofluck_message",
-          "patterns": [
-            "message: best of luck",
-            "good luck wishes",
-            "all the best",
-            "exam wishes"
-          ],
-          "responses": [
-            "Best of luck 99999! I know you’ll do great.",
-            "All the best 99999! Wishing you success always.",
-            "Good luck 99999! Believe in yourself."
-          ]
-        }
+      "tag": "morning_message",
+      "patterns": [
+        "message: good morning",
+        "good morning message",
+        "send good morning",
+        "good morning"
+      ],
+      "responses": [
+        "Good Morning 99999! Have a wonderful day ahead!",
+        "Rise and shine, 99999! Good Morning!",
+        "Wishing you a bright and happy morning, 99999!"
+      ]
+    },
+    {
+      "tag": "afternoon_message",
+      "patterns": [
+        "message: good afternoon",
+        "good afternoon message",
+        "send good afternoon",
+        "good afternoon"
+      ],
+      "responses": [
+        "Good Afternoon 99999! Hope your day is going well.",
+        "Good Afternoon 99999, stay positive and energetic!",
+        "Wishing you a refreshing Good Afternoon 99999!"
+      ]
+    },
+    {
+      "tag": "evening_message",
+      "patterns": [
+        "message: good evening",
+        "good evening message",
+        "send good evening",
+        "good evening"
+      ],
+      "responses": [
+        "Good Evening 99999! Relax and enjoy the night.",
+        "Hope you had a productive day, 99999! Good Evening!",
+        "Good Evening 99999, wishing you peace and joy tonight."
+      ]
+    },
+    {
+      "tag": "night_message",
+      "patterns": [
+        "message: good night",
+        "good night message",
+        "send good night",
+        "good night"
+      ],
+      "responses": [
+        "Good Night 99999! Sweet dreams!",
+        "Sleep well, 99999. Have a peaceful night!",
+        "Good Night 99999, may tomorrow be brighter!"
+      ]
+    },
+    {
+      "tag": "festival_message",
+      "patterns": [
+        "message: happy diwali",
+        "diwali wishes",
+        "pongal wishes",
+        "happy new year",
+        "christmas wishes"
+      ],
+      "responses": [
+        "Happy Diwali 99999! May your life be filled with lights and joy.",
+        "Wishing you and your family a very Happy Pongal, 99999!",
+        "Merry Christmas 99999! , May your holiday season be full of happiness.",
+        "Happy New Year 99999! , May this year bring success and smiles!"
+      ]
+    },
+    {
+      "tag": "thankyou_message",
+      "patterns": [
+        "message: thank you",
+        "send thanks",
+        "thank you message",
+        "thanks"
+      ],
+      "responses": [
+        "Thank you 99999! You're the best.",
+        "Thanks a lot 99999, really appreciate it!",
+        "Many thanks 99999! Your kindness means a lot."
+      ]
+    },
+    {
+      "tag": "sorry_message",
+      "patterns": [
+        "message: sorry",
+        "apology message",
+        "send sorry",
+        "forgive me"
+      ],
+      "responses": [
+        "I'm really sorry 99999, please forgive me.",
+        "Sorry 99999, it won’t happen again.",
+        "Apologies 99999, I didn’t mean to hurt you."
+      ]
+    },
+    {
+      "tag": "friendship_message",
+      "patterns": [
+        "message: friendship",
+        "send friendship message",
+        "best friend wishes",
+        "friendship day"
+      ],
+      "responses": [
+        "A true friend like you is a blessing, 99999!",
+        "Friendship is the purest bond , Thank you 99999!",
+        "Happy Friendship Day 99999! You're awesome."
+      ]
+    },
+    {
+      "tag": "love_message",
+      "patterns": [
+        "message: love",
+        "send love message",
+        "i love you"
+      ],
+      "responses": [
+        "I love you 99999 ",
+        "Love you to the moon and back, 99999!",
+        "99999, you mean the world to me "
+      ]
+    },
+    {
+      "tag": "motivational_message",
+      "patterns": [
+        "message: motivation",
+        "send motivational message",
+        "inspiration",
+        "motivational quote"
+      ],
+      "responses": [
+        "Believe in yourself, 99999! You can do it.",
+        "Success comes to those who never give up. Keep going 99999!",
+        "Stay positive and strong, 99999. Your hard work will pay off!"
+      ]
+    },
+    {
+      "tag": "getwell_message",
+      "patterns": [
+        "message: get well soon",
+        "send recovery wishes",
+        "sick message",
+        "feel better"
+      ],
+      "responses": [
+        "Get well soon 99999! Wishing you a speedy recovery.",
+        "Take care 99999, your health is most important.",
+        "Sending healing vibes your way, 99999. Get well soon!"
+      ]
+    },
+    {
+      "tag": "bestofluck_message",
+      "patterns": [
+        "message: best of luck",
+        "good luck wishes",
+        "all the best",
+        "exam wishes"
+      ],
+      "responses": [
+        "Best of luck 99999! I know you’ll do great.",
+        "All the best 99999! Wishing you success always.",
+        "Good luck 99999! Believe in yourself."
+      ]
+    },
+    {
+      "tag": "greeting_message_ta_en",
+      "patterns": [
+        "gm da",
+        "gud mrng bro",
+        "vanakkam da",
+        "good mrng macha",
+        "saptiya da gm"
+      ],
+      "responses": [
+        "Good morning 99999 da! Have a nice day!",
+        "Vanakkam 99999! Good Morning!",
+        "Gud mrng 99999! Have a blast today!"
+      ]
+    },
+    {
+      "tag": "birthday_message_ta_en",
+      "patterns": [
+        "hbd da",
+        "hpbd bro",
+        "happy birthday da",
+        "bday wishes",
+        "happy bday machi"
+      ],
+      "responses": [
+        "HBD 99999 da! Have a rocking year ahead!",
+        "Happy Birthday 99999 🎂 Wishing you all success!",
+        "Bday wishes 99999! Stay blessed."
+      ]
+    },
+    {
+      "tag": "night_message_ta_en",
+      "patterns": [
+        "gn da",
+        "gud nyt bro",
+        "good night da",
+        "sleep well macha",
+        "nyt da"
+      ],
+      "responses": [
+        "Gud nyt 99999 😴 Sweet dreams!",
+        "Sleep well da 99999, take care!",
+        "Good night 99999! Tomorrow will be awesome."
+      ]
+    },
+    {
+      "tag": "congratulations_message_ta_en",
+      "patterns": [
+        "congrats da",
+        "super da",
+        "semma da",
+        "mass bro",
+        "bigil bro congrats"
+      ],
+      "responses": [
+        "Congrats 99999 da! Vera level!",
+        "Semma scene 99999, congratulations!",
+        "Mass ah pannita 99999! Congrats!"
+      ]
+    },
+    {
+      "tag": "anniversary_message",
+      "patterns": [
+        "happy anniversary",
+        "anniversary wishes",
+        "marriage anniversary",
+        "wedding day wishes",
+        "anniversary message"
+      ],
+      "responses": [
+        "Happy Anniversary 99999! Wishing you endless love and happiness.",
+        "Congrats 99999 on your special day. Happy Anniversary!",
+        "Happy Wedding Anniversary 99999! Many more years of togetherness."
+      ]
+    },
+    {
+      "tag": "anniversary_message_ta_en",
+      "patterns": [
+        "happy anni da",
+        "marriage anni wishes",
+        "happy wedding day bro",
+        "anni vazhthukkal",
+        "hp anni 99999"
+      ],
+      "responses": [
+        "Happy Anniversary 99999 da! Always be happy together.",
+        "Anni wishes 99999! Stay blessed forever ❤️",
+        "Congrats 99999, happy wedding day!"
       ]
     }
   ]

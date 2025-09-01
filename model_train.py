@@ -15,7 +15,7 @@ def simple_tokenizer(txt):
 # -------------------------------
 # Load intents file
 # -------------------------------
-with open("data/intents.json", "r") as f:
+with open("data/greeting.json", "r") as f:
     intents = json.load(f)
 
 # -------------------------------
@@ -107,5 +107,5 @@ data = {
     "y_labels": y_labels
 }
 
-torch.save(data, "nlp_model/chat_model.pth")
-print("Training complete. Model saved as chat_model.pth")
+torch.save(data, "nlp_model/greeting.pth")
+print("Training complete. Model saved as greeting.pth")

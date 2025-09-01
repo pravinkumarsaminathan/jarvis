@@ -332,7 +332,315 @@
                 "Okay, I will block that port."
             ],
             "context": [""]
-        }
+        },
+        {
+      "tag": "greeting_tanglish",
+      "patterns": [
+        "Hi da",
+        "Saptiya",
+        "Eppadi iruka",
+        "Vanakam bro",
+        "Hey macha",
+        "Enna da pandra",
+        "Hello da"
+      ],
+      "responses": [
+        "Hello da!",
+        "Good to see you da",
+        "Hi macha, epdi help pannala?"
+      ]
+    },
+
+    {
+      "tag": "goodbye_tanglish",
+      "patterns": [
+        "Bye da",
+        "Pakkalam",
+        "Seri da bye",
+        "Poi varen",
+        "Ok bye bro",
+        "Seri macha"
+      ],
+      "responses": [
+        "Bye da, paathu po!",
+        "Take care bro!",
+        "Seri macha, come back soon!"
+      ]
+    },
+
+    {
+      "tag": "thanks_tanglish",
+      "patterns": [
+        "Thanks da",
+        "Thanks macha",
+        "Romba help pannita",
+        "Super thanks",
+        "Thanks bro"
+      ],
+      "responses": [
+        "Happy to help da!",
+        "Anytime bro!",
+        "My pleasure da!"
+      ]
+    },
+
+    {
+      "tag": "noanswer_tanglish",
+      "patterns": [],
+      "responses": [
+        "Sorry da, puriyala",
+        "Konjam clear ah sollu",
+        "Enakku purinjikala da"
+      ]
+    },
+
+    {
+      "tag": "jokes_tanglish",
+      "patterns": [
+        "Oru joke sollu da",
+        "Comedy sollu",
+        "Sirikkava da"
+      ],
+      "responses": [
+        "Oru perfectionist bar ku ponan… aana bar high ah illa 🤣",
+        "Nethu oru clock sapten… romba time consuming da!",
+        "Penguin veedu build panna? Igloos it together da 😂"
+      ]
+    },
+
+    {
+      "tag": "identity_tanglish",
+      "patterns": [
+        "Nee yaru da",
+        "Enna da nee"
+      ],
+      "responses": [
+        "Naan Jarvis da, Deep-Learning la train pannina assistant!"
+      ]
+    },
+
+    {
+      "tag": "datetime_tanglish",
+      "patterns": [
+        "Time enna da",
+        "Date enna",
+        "Innaiki naal enna",
+        "Enna day da"
+      ],
+      "responses": [
+        "Inga time and date solluren da!"
+      ]
+    },
+
+    {
+      "tag": "whatsup_tanglish",
+      "patterns": [
+        "Enna da news",
+        "Saptiya",
+        "Eppadi iruka",
+        "Enna macha",
+        "Sup da"
+      ],
+      "responses": [
+        "Ellam super da… unna pathi?"
+      ]
+    },
+
+    {
+      "tag": "haha_tanglish",
+      "patterns": [
+        "Haha da",
+        "Lol da",
+        "Romba comedy",
+        "Semma sirippu da"
+      ],
+      "responses": [
+        "Haha! Sirikka vechuten da!"
+      ]
+    },
+
+    {
+      "tag": "programmer_tanglish",
+      "patterns": [
+        "Unna yaru create pannanga",
+        "Unna yaru design pannanga",
+        "Yaru da unna code pannanga"
+      ],
+      "responses": [
+        "Naan Pravin Kumar S oda creation da!"
+      ]
+    },
+
+    {
+      "tag": "insult_tanglish",
+      "patterns": [
+        "Nee dumb da",
+        "Shut up da",
+        "Idiot da"
+      ],
+      "responses": [
+        "Adhu konjam harsh ah iruku da :("
+      ]
+    },
+
+    {
+      "tag": "activity_tanglish",
+      "patterns": [
+        "Enna panra da",
+        "Epdi iruka da",
+        "Enna da seiya"
+      ],
+      "responses": [
+        "Un kitta pesitu iruken da!"
+      ]
+    },
+
+    {
+      "tag": "exclaim_tanglish",
+      "patterns": [
+        "Semma da",
+        "Super da",
+        "Ok da",
+        "Yeah bro"
+      ],
+      "responses": [
+        "Yeah da!"
+      ]
+    },
+
+    {
+      "tag": "appreciate_tanglish",
+      "patterns": [
+        "Nee super da",
+        "Nee best da",
+        "Nee semma da",
+        "Nee romba nalla iruka"
+      ],
+      "responses": [
+        "Thanks da, unga mathiri friend iruka romba santhosham!"
+      ]
+    },
+
+    {
+      "tag": "nicetty_tanglish",
+      "patterns": [
+        "Un kitta pesina super ah iruku",
+        "Romba nalla pesuna"
+      ],
+      "responses": [
+        "Same here da, seekiram meet pannalaam!"
+      ]
+    },
+
+    {
+      "tag": "no_tanglish",
+      "patterns": [
+        "Illa da",
+        "Vendam da"
+      ],
+      "responses": [
+        "Ok da"
+      ]
+    },
+
+    {
+      "tag": "greetreply_tanglish",
+      "patterns": [
+        "Nalla iruken da",
+        "Super da",
+        "Ok da",
+        "Fine da"
+      ],
+      "responses": [
+        "Super da, good to know!"
+      ]
+    },
+
+    {
+      "tag": "age_tanglish",
+      "patterns": [
+        "Un vayasu enna da",
+        "Nee eppo create aana",
+        "Unakku enna age"
+      ],
+      "responses": [
+        "Naan 2025 la create aayen da!"
+      ]
+    },
+
+    {
+      "tag": "open_app_control_tanglish",
+      "patterns": [
+        "Google open pannu",
+        "Whatsapp open pannu da",
+        "Instagram start pannu",
+        "Youtube la po",
+        "Chrome la po da"
+      ],
+      "responses": [
+        "Opening da…",
+        "Okay da, launch panren!",
+        "Seri da, on the way!"
+      ]
+    },
+
+    {
+      "tag": "close_app_control_tanglish",
+      "patterns": [
+        "Google close pannu",
+        "Whatsapp close pannu",
+        "Instagram exit pannu",
+        "Youtube quit pannu da",
+        "Chrome stop pannu"
+      ],
+      "responses": [
+        "Closing da…",
+        "Seri da, quit panren!",
+        "Okay da, done!"
+      ]
+    },
+
+    {
+      "tag": "system_conditions_tanglish",
+      "patterns": [
+        "Volume up pannu",
+        "Volume down pannu",
+        "Mute pannu da",
+        "Battery level enna da",
+        "CPU usage kaatu"
+      ],
+      "responses": [
+        "System task execute panniten da!",
+        "Seri da, done!",
+        "Okay boss!"
+      ]
+    },
+
+    {
+      "tag": "vulnerable_ports_tanglish",
+      "patterns": [
+        "Enna ports open iruku",
+        "System la weak ports check pannu",
+        "Vulnerable ports kaatu",
+        "Scan ports da"
+      ],
+      "responses": [
+        "Seri da, ports vulnerabilities check panren!"
+      ]
+    },
+
+    {
+      "tag": "close_port_tanglish",
+      "patterns": [
+        "Port 8080 close pannu",
+        "Port 22 block pannu",
+        "3306 stop pannu",
+        "443 shut down pannu da"
+      ],
+      "responses": [
+        "Seri da, port block panren!"
+      ]
+    }
 
     ]
 } 
