@@ -140,6 +140,12 @@ class JarvisOverlay(QtWidgets.QWidget):
 
         self.subtitle_update.connect(self._set_subtitle)
         self.reset_subtitle_signal.connect(self._reset_subtitle_later)
+
+        self._voice_session = 0
+
+        self._audio_buffer = []
+        self._audio_recording = False
+        self._audio_samplerate = 16000
     
     def _audio_callback(self, indata, frames, time, status):
         # Example: compute audio level and update equalizer
@@ -201,6 +207,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         if self._listening:
             return
         self._listening = True
+        self._voice_session += 1
         self.panel.set_listening(True)
         self.resize(420, 420)
         self._center_on_screen()
@@ -209,12 +216,15 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.input.hide()
         self.subtitle.setText("Listening — hold CTRL+S and \nspeak")
         self.glow.show_glow()
-        if sd is not None and np is not None:
-            self._start_audio_capture()
-        # Start recording audio
-        self._voice_stop_flag.clear()
-        self._voice_recording = True
-        threading.Thread(target=self._record_voice, daemon=True).start()
+        self._audio_buffer = []
+        self._audio_recording = True
+        self._audio_samplerate = 16000
+        self._audio_stream = sd.InputStream(
+            samplerate=self._audio_samplerate,
+            channels=1,
+            callback=self._audio_callback_buffer
+        )
+        self._audio_stream.start()
 
     def _stop_listening(self):
         if not self._listening:
@@ -226,12 +236,15 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.eq.set_listening(False)
         self.mic_hint.hide()
         self.input.show()
-        self.subtitle_update.emit("Recognizing…")  # Show in rectangle
-        self._stop_audio_capture()
+        self._audio_recording = False
+        if self._audio_stream is not None:
+            self._audio_stream.stop()
+            self._audio_stream.close()
+            self._audio_stream = None
         self.glow.set_intensity(0.0)
         self.glow.hide_glow()
-        # Start recognition
-        threading.Thread(target=self._recognize_voice, daemon=True).start()
+        self.subtitle_update.emit("Recognizing…")
+        threading.Thread(target=self._recognize_buffered_audio, daemon=True).start()
 
     def _outside_click(self):
         if self.isVisible():
@@ -334,26 +347,21 @@ class JarvisOverlay(QtWidgets.QWidget):
                 self.mic_hint_update.emit(f"Error: {e}")
                 self.stop_listening_signal.emit()
     
-    def _record_voice(self):
+    def _record_and_recognize_voice(self, session):
         recognizer = sr.Recognizer()
         mic = sr.Microphone()
         with mic as source:
             self.mic_hint_update.emit("Listening…")
             try:
-                # Listen for up to 5 seconds or until silence
                 audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
-                self._voice_audio = audio
             except Exception as e:
-                self._voice_audio = None
                 self.mic_hint_update.emit(f"Mic error: {e}")
-
-    def _recognize_voice(self):
-        recognizer = sr.Recognizer()
-        audio = self._voice_audio
-        if audio is None:
-            self.mic_hint_update.emit("Didn't hear anything.")
-            self.reset_subtitle_signal.emit()
+                self.reset_subtitle_signal.emit()
+                return
+        # Only process if session is still current
+        if session != self._voice_session:
             return
+        self.subtitle_update.emit("Recognizing…")
         try:
             text = recognizer.recognize_google(audio)
             cleaned = text.strip().lower()
@@ -370,5 +378,46 @@ class JarvisOverlay(QtWidgets.QWidget):
             self.mic_hint_update.emit(f"Error: {e}")
             self.reset_subtitle_signal.emit()
     
-    def _reset_subtitle_later(self, delay_ms=1200):
-        QtCore.QTimer.singleShot(delay_ms, lambda: self.subtitle_update.emit("           Press CTRL+S to Speak           "))
+    def _audio_callback_buffer(self, indata, frames, time, status):
+        if self._audio_recording:
+            self._audio_buffer.append(indata.copy())
+            # Compute audio level for equalizer
+            level = float((indata**2).mean())**0.5
+            self.eq.level_changed.emit(level)
+
+    def _recognize_buffered_audio(self):
+        import io
+        import wave
+        recognizer = sr.Recognizer()
+        # Concatenate all audio chunks
+        if not self._audio_buffer:
+            self.subtitle_update.emit("try again...")
+            self.reset_subtitle_signal.emit()
+            return
+        audio_data = np.concatenate(self._audio_buffer, axis=0)
+        # Convert to 16-bit PCM WAV in memory
+        with io.BytesIO() as wav_io:
+            with wave.open(wav_io, 'wb') as wf:
+                wf.setnchannels(1)
+                wf.setsampwidth(2)
+                wf.setframerate(self._audio_samplerate)
+                wf.writeframes((audio_data * 32767).astype(np.int16).tobytes())
+            wav_io.seek(0)
+            audio = sr.AudioFile(wav_io)
+            with audio as source:
+                try:
+                    data = recognizer.record(source)
+                    text = recognizer.recognize_google(data)
+                    cleaned = text.strip().lower()
+                    if not cleaned:
+                        self.subtitle_update.emit("try again...")
+                        self.reset_subtitle_signal.emit()
+                        return
+                    self.handle_query(cleaned)
+                    self.reset_subtitle_signal.emit()
+                except sr.UnknownValueError:
+                    self.mic_hint_update.emit("Sorry, I didn't catch that.")
+                    self.reset_subtitle_signal.emit()
+                except Exception as e:
+                    self.mic_hint_update.emit(f"Error: {e}")
+                    self.reset_subtitle_signal.emit()

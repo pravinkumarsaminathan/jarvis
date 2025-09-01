@@ -70,6 +70,6 @@ class JarvisAssistant:
             #         close_port(port)
             #     else:
             #         speak("Please specify which port you want me to close.")
-            else:
-                speak(response)
-                print("Bot:", response)
+        else:
+            speak(response)
+            print("Bot:", response)

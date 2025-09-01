@@ -31,10 +31,18 @@ def load_contacts(filepath="data/contacts.json"):
         return json.load(f)
 
 def send_whatsapp_message(phone_number, message):
+    pyautogui.keyDown("ctrl")
+    pyautogui.keyUp("ctrl")
+    pyautogui.keyDown("ctrl")
+    pyautogui.keyUp("ctrl")
     pywhatkit.sendwhatmsg_instantly(phone_number, message, wait_time=10, tab_close=True)
     time.sleep(4)
     pyautogui.press("enter")
     pyautogui.hotkey("ctrl", "w")
+    pyautogui.keyDown("ctrl")
+    pyautogui.keyUp("ctrl")
+    pyautogui.keyDown("ctrl")
+    pyautogui.keyUp("ctrl")
     print("Bot: Message sent and tab closed.")
 
 class WhatsAppModel(nn.Module):
