@@ -12,6 +12,17 @@ import wikipedia
 
 OPENWEATHER_API_KEY = "ca8004bcd630a58b8fc39755e6dfb46c"   # replace with your API key
 
+THANGLISH_KEYWORDS = {
+    "hi", "da", "saptiya", "eppadi", "iruka", "vanakam", "bro", "hey", "macha", "enna", "pandra", "hello",
+    "bye", "pakkalam", "seri", "poi", "varen", "romba", "help", "pannita", "super", "oru",
+    "joke", "sollu", "comedy", "sirikkava", "nee", "yaru", "innaiki", "naal", "day", "news",
+    "sup", "haha", "lol", "semma", "sirippu", "unna", "create", "pannanga",
+    "panra", "seiya", "pesitu", "iruken", "vayasu", "eppo", "aana",
+    "pannu", "la", "po", "chrome", "close", "exit", "quit", "kaatu", "panniten", "pannittu",
+    "panren", "pesina", "nalla", "pesuna", "vendam", "iruken", "unakku",
+    "un", "seekiram", "pannalaam", "iruka", "santhosham", "mathiri"
+}
+
 def command():
     r = sr.Recognizer()
     # Suppress ALSA/JACK errors
@@ -36,13 +47,6 @@ def command():
         os.close(devnull)
 
 def detect_voice(query):
-    THANGLISH_KEYWORDS = {
-        "enna", "epdi", "irukka", "saptiya", "illa", "romba", "nalla", "paathu", "vaanga", "poda", "pannu", "thambi",
-        "macha", "da", "daan", "veedu", "kaatu", "yaru", "pathi", "pesitu", "pesina", "solu", "eppadi", "iruka",
-        "puranjika", "seriya", "seri", "seiya", "panra", "pandra", "un", "unna", "vayasu",
-        "vendam", "haha", "sirikkava","super", "bro", "konjam", "apdiya"
-        # Add more keywords here...
-    }
     """
     Detect if the query is in English or Thanglish (Tamil in Latin script).
     Returns the appropriate voice string.

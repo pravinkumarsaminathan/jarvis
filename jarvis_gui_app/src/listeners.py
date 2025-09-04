@@ -14,6 +14,7 @@ class GlobalListeners(threading.Thread):
     def run(self):
         def on_press(key):
             try:
+                # Always allow ctrl+ctrl to toggle overlay
                 if key in (keyboard.Key.ctrl, keyboard.Key.ctrl_l, keyboard.Key.ctrl_r):
                     now = int(time.time() * 1000)
                     if now - self._last_ctrl_time <= 400:
@@ -24,8 +25,9 @@ class GlobalListeners(threading.Thread):
                     else:
                         self._last_ctrl_time = now
                     self._ctrl_pressed = True
+
+                # Allow ctrl+s to start listening only when overlay is visible
                 elif key == keyboard.KeyCode.from_char('s') and self._ctrl_pressed:
-                    # Only allow CTRL+S if overlay is visible and NOT already listening (rectangle mode)
                     if self.overlay.isVisible() and not getattr(self.overlay, "_listening", False):
                         QtCore.QMetaObject.invokeMethod(
                             self.bridge, "start_listening", QtCore.Qt.QueuedConnection
@@ -47,4 +49,5 @@ class GlobalListeners(threading.Thread):
 
         listener = keyboard.Listener(on_press=on_press, on_release=on_release)
         listener.start()
-        #listener.join() 12
+        while True:
+            time.sleep(1) #
