@@ -35,7 +35,25 @@ def command():
         os.dup2(old_stderr, 2)
         os.close(devnull)
 
-def speak(text, speed=1.0, voice="en-US-AriaNeural"):
+def detect_voice(query):
+    THANGLISH_KEYWORDS = {
+        "enna", "epdi", "irukka", "saptiya", "illa", "romba", "nalla", "paathu", "vaanga", "poda", "pannu", "thambi",
+        "macha", "da", "daan", "veedu", "kaatu", "yaru", "pathi", "pesitu", "pesina", "solu", "eppadi", "iruka",
+        "puranjika", "seriya", "seri", "seiya", "panra", "pandra", "un", "unna", "vayasu",
+        "vendam", "haha", "sirikkava","super", "bro", "konjam", "apdiya"
+        # Add more keywords here...
+    }
+    """
+    Detect if the query is in English or Thanglish (Tamil in Latin script).
+    Returns the appropriate voice string.
+    """
+    words = set(query.lower().split())
+    if THANGLISH_KEYWORDS & words:
+        return "ta-IN-PallaviNeural"
+    return "en-US-AriaNeural"
+
+def speak(text, speed=1.0):
+    voice = detect_voice(text)
     """
     Stream TTS from local server and play instantly with mpg123.
     """
@@ -75,16 +93,16 @@ def cal_day():
     day = datetime.datetime.today().weekday() + 1
     return ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][day-1]
 
-def open_app(cmd):
+def open_app(cmd, response):
     if "calculator" in cmd:
         subprocess.Popen(["gnome-calculator"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        speak(f"Opening calculator")
+        speak(response)
     elif "notepad" in cmd:
         subprocess.Popen(["gedit"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        speak(f"Opening notepad")
+        speak(response)
     elif "paint" in cmd:
         subprocess.Popen(["gimp"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        speak(f"Opening paint")
+        speak(response)
     elif "google" in cmd:
         browsing()
     else:
@@ -101,15 +119,15 @@ def open_app(cmd):
                 return
         speak("No result found")
 
-def close_app(cmd):
+def close_app(cmd, response):
     if "calculator" in cmd:
-        speak(f"Closing calculator")
+        speak(response)
         os.system("pkill -f gnome-calculator > /dev/null 2>&1")
     elif "notepad" in cmd:
-        speak(f"Closing notepad")
+        speak(response)
         os.system("pkill -f gedit > /dev/null 2>&1")
     elif "paint" in cmd:
-        speak(f"Closing paint")
+        speak(response)
         os.system("pkill -f gimp > /dev/null 2>&1")
     else:
         speak("sorry i don't have access to do that.")

@@ -58,9 +58,9 @@ class JarvisAssistant:
         # ---------------- Tag Handling ----------------
         # ---------------- Tag Handling ----------------
         if tag == "open_app_control" or tag=="open_app_control_tanglish":
-            open_app(query)
+            open_app(query, response)
         elif tag == "close_app_control" or tag=="close_app_control_tanglish":
-            close_app(query)
+            close_app(query, response)
         elif "schedule" in query or "university time table" in query:
             schedule()
         elif tag == "system_conditions" or tag=="system_conditions_tanglish":
