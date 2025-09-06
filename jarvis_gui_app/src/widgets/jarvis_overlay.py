@@ -9,6 +9,7 @@ from bridge import Bridge
 import sounddevice as sd
 import numpy as np
 from assistance.core import JarvisAssistant
+from assistance.mini_ai_mentor import MiniAIMentor
 import threading
 import speech_recognition as sr
 from PySide6.QtCore import Slot
@@ -40,6 +41,9 @@ class JarvisOverlay(QtWidgets.QWidget):
     def __init__(self, bridge: Bridge, glow: PerimeterGlow, click_catcher: ClickCatcher):
         super().__init__()
         self.assistant = JarvisAssistant()
+        self.mentor = MiniAIMentor()
+        background_thread = threading.Thread(target=self.mentor.run_background, daemon=True)
+        background_thread.start()
         self.glow = glow
         self._audio_stream = None
         self.click_catcher = click_catcher
@@ -161,6 +165,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.move(x, y)
 
     def show_overlay(self):
+        self.mentor.set_popup_state(True)
         self.click_catcher.show()
         self.show()
         self.raise_()
@@ -180,6 +185,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         self._open_anim.start()
 
     def hide_overlay(self):
+        self.mentor.set_popup_state(False)
         screen = QtGui.QGuiApplication.primaryScreen().geometry()
         x = int((screen.width() - self.width()) / 2)
         start_pos = self.pos()
