@@ -8,6 +8,7 @@ import json
 import requests
 import speech_recognition as sr
 import nmap
+import threading
 import wikipedia
 
 OPENWEATHER_API_KEY = "ca8004bcd630a58b8fc39755e6dfb46c"   # replace with your API key
@@ -56,30 +57,33 @@ def detect_voice(query):
         return "ta-IN-PallaviNeural"
     return "en-US-AriaNeural"
 
+_speak_lock = threading.Lock()
+
 def speak(text, speed=1.0):
-    voice = detect_voice(text)
-    """
-    Stream TTS from local server and play instantly with mpg123.
-    """
-    payload = {
-        "input": text,
-        "voice": voice,
-        "response_format": "mp3",
-        "speed": speed
-    }
+    with _speak_lock:
+        voice = detect_voice(text)
+        """
+        Stream TTS from local server and play instantly with mpg123.
+        """
+        payload = {
+            "input": text,
+            "voice": voice,
+            "response_format": "mp3",
+            "speed": speed
+        }
 
-    curl_cmd = [
-        "curl", "-s", "-X", "POST", "http://localhost:5050/v1/audio/speech",
-        "-H", "Content-Type: application/json",
-        "-H", "Authorization: Bearer your_api_key_here",
-        "-d", json.dumps(payload)
-    ]
+        curl_cmd = [
+            "curl", "-s", "-X", "POST", "http://localhost:5050/v1/audio/speech",
+            "-H", "Content-Type: application/json",
+            "-H", "Authorization: Bearer your_api_key_here",
+            "-d", json.dumps(payload)
+        ]
 
-    mpg123_cmd = ["mpg123", "-"]
-    curl_proc = subprocess.Popen(curl_cmd, stdout=subprocess.PIPE)
-    subprocess.run(mpg123_cmd, stdin=curl_proc.stdout, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    curl_proc.stdout.close()
-    curl_proc.wait()
+        mpg123_cmd = ["mpg123", "-"]
+        curl_proc = subprocess.Popen(curl_cmd, stdout=subprocess.PIPE)
+        subprocess.run(mpg123_cmd, stdin=curl_proc.stdout, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        curl_proc.stdout.close()
+        curl_proc.wait()
     #os.system(f'edge-playback --text "{text}" --voice en-US-AriaNeural > /dev/null 2>&1')
 
 def wish_me():
