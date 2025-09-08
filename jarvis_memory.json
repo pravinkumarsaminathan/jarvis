@@ -1,0 +1,17 @@
+[
+  {
+    "action": "Opened firefox-esr",
+    "timestamp": "2025-09-08 08:36 PM"
+  },
+  {
+    "action": "Opened code",
+    "timestamp": "2025-09-08 09:38 PM"
+  },
+  {
+    "action": "Opened qterminal",
+    "timestamp": "2025-09-08 10:38 PM",
+    "details": {
+      "cwd": "/home/pravin"
+    }
+  }
+]
