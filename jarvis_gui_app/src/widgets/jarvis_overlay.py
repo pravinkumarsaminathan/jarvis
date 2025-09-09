@@ -10,6 +10,7 @@ import sounddevice as sd
 import numpy as np
 from assistance.core import JarvisAssistant
 from assistance.mini_ai_mentor import MiniAIMentor
+from assistance.workspace import JarvisWorkspaceManager
 import threading
 import speech_recognition as sr
 from PySide6.QtCore import Slot
@@ -42,8 +43,11 @@ class JarvisOverlay(QtWidgets.QWidget):
         super().__init__()
         self.assistant = JarvisAssistant()
         self.mentor = MiniAIMentor()
+        self.workspace_manager = JarvisWorkspaceManager()
         background_thread = threading.Thread(target=self.mentor.run_background, daemon=True)
         background_thread.start()
+        t = threading.Thread(target=self.workspace_manager.monitor_apps, daemon=True)
+        t.start()
         self.glow = glow
         self._audio_stream = None
         self.click_catcher = click_catcher
@@ -266,6 +270,9 @@ class JarvisOverlay(QtWidgets.QWidget):
 
     def handle_query(self, text: str):
         self.subtitle.setText(f"You said: {text.lower().strip()}")
+        if "workspace" in text.lower():
+            threading.Thread(target=self.workspace_manager.restore_workspace, args=(text,), daemon=True).start()
+            return
         threading.Thread(target=self.assistant.run, args=(text,), daemon=True).start()
         self.input.show()
         self._ensure_input_focus()
