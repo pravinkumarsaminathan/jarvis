@@ -362,3 +362,40 @@ def play_youtube_music(song_name):
     ])
     speak("Playing song....")
     print("playing song....")
+
+def order_product(query: str) -> str:
+    """
+    Extracts product name from query and searches on Amazon or Flipkart.
+    Returns a short response for speech.
+    """
+
+    q = query.lower().strip()
+
+    # Detect platform
+    if "flipkart" in q:
+        platform = "Flipkart"
+    elif "amazon" in q:
+        platform = "Amazon"
+    else:
+        platform = "Amazon"  # default
+
+    # Remove platform words
+    q = q.replace("on amazon", "").replace("on flipkart", "").strip()
+
+    # Extract product: everything after buy/purchase/order
+    product = None
+    for keyword in ["buy", "purchase", "order"]:
+        if keyword in q:
+            product = q.split(keyword, 1)[1].strip()
+            break
+
+    if not product:
+        return "What product would you like me to order?"
+
+    # Platform-specific search
+    if platform == "Amazon":
+        webbrowser.open(f"https://www.amazon.in/s?k={product.replace(' ', '+')}")
+    elif platform == "Flipkart":
+        webbrowser.open(f"https://www.flipkart.com/search?q={product.replace(' ', '+')}")
+
+    return f"Searching deals on {product} on {platform}."
