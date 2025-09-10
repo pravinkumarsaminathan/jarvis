@@ -55,7 +55,7 @@ class JarvisAssistant:
             response = order_product(query)
             speak(response)
             print("Bot:", response)
-            return
+            return
         
 
         # ---------------- Normal Chatbot ----------------
