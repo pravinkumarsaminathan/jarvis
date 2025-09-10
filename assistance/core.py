@@ -3,7 +3,7 @@ import torch
 
 from .nlp import ChatbotNLP
 from .whatsapp import WhatsAppHandler
-from .utils import speak, open_app, close_app, schedule, condition, volume_control, command, search_wikipedia, get_weather, play_youtube_music
+from .utils import speak, open_app, close_app, schedule, condition, volume_control, command, search_wikipedia, get_weather, play_youtube_music, order_product
 
 class JarvisAssistant:
     """
@@ -51,6 +51,11 @@ class JarvisAssistant:
             print("Bot:", response)
             play_youtube_music(song_name)
             return
+        elif any(word in query.lower() for word in ["buy", "purchase", "order"]):
+            response = order_product(query)
+            speak(response)
+            print("Bot:", response)
+            return
         
 
         # ---------------- Normal Chatbot ----------------
