@@ -345,7 +345,7 @@ class JarvisOverlay(QtWidgets.QWidget):
                     self.mic_hint_update.emit("Stopped.")
                     return
                 self.mic_hint_update.emit("Recognizing…")
-                text = recognizer.recognize_google(audio)
+                text = recognizer.recognize_google(audio, language="en-IN")
                 if not self._voice_stop_flag.is_set():
                     self.stop_listening_signal.emit()
                     self.input_update.emit(text)

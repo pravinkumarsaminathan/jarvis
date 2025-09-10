@@ -43,6 +43,7 @@ def command():
             print("Say that again please...")
             return "none"
         return query.lower()
+    
     finally:
         os.dup2(old_stderr, 2)
         os.close(devnull)
@@ -113,6 +114,29 @@ def open_app(cmd, response):
         speak(response)
     elif "google" in cmd:
         browsing()
+    elif "youtube" in cmd:
+        youtube()
+    elif "code" in cmd or "visual studio" in cmd or "v s code" in cmd:
+        subprocess.Popen(["code"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        speak(response)
+    elif "terminal" in cmd or "command prompt" in cmd or "cmd" in cmd:
+        # XFCE terminal
+        try:
+            speak(response)
+            subprocess.Popen(["qterminal"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            speak(response)
+        except FileNotFoundError:
+            speak("Terminal application not found.")
+    elif "file manager" in cmd or "files" in cmd or "explorer" in cmd:
+        # XFCE file manager
+        try:
+            speak(response)
+            subprocess.Popen(["thunar"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except FileNotFoundError:
+            speak("File manager application not found.")
+    elif "camera" in cmd:
+        speak(response)
+        subprocess.Popen(['cheese'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
         sites = {
             "facebook": "https://www.facebook.com/",
@@ -137,6 +161,15 @@ def close_app(cmd, response):
     elif "paint" in cmd:
         speak(response)
         os.system("pkill -f gimp > /dev/null 2>&1")
+    elif "code" in cmd or "visual studio" in cmd or "v s code" in cmd:
+        speak(response)
+        os.system("pkill -f code > /dev/null 2>&1")
+    elif "file manager" in cmd or "files" in cmd or "explorer" in cmd:
+        speak(response)
+        os.system("pkill -f thunar > /dev/null 2>&1")
+    elif "camera" in cmd:
+        speak(response)
+        os.system("pkill -f cheese > /dev/null 2>&1")
     else:
         speak("sorry i don't have access to do that.")
 
@@ -209,6 +242,12 @@ def browsing():
     s = command()
     if s != "None":
         webbrowser.open(f"https://www.google.com/search?q={s}")
+
+def youtube():
+    speak("Boss, what should I search on youtube?")
+    s = command()
+    if s != "None":
+        webbrowser.open(f"https://www.youtube.com/search?q={s}")
 
 def condition():
     usage = str(psutil.cpu_percent())
@@ -308,3 +347,18 @@ def extract_city(query: str) -> str:
             city = city.replace(w, "").strip()
         return city
     return None
+
+def play_youtube_music(song_name):
+    # Get the first video URL quickly
+    url = subprocess.check_output(
+        ["yt-dlp", f"ytsearch1:{song_name}", "--get-url", "-f", "bestaudio"],
+        text=True  # ensures output is a string, not bytes
+    ).strip()
+
+    # Play it instantly in mpv
+    #os.system(f'mpv --no-video "{url}"')
+    subprocess.Popen([
+        "mpv", "--force-window=yes", "--osc=yes", url
+    ])
+    speak("Playing song....")
+    print("playing song....")

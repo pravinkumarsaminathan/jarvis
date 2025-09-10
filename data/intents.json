@@ -279,6 +279,9 @@
                 "quit whatsapp",
                 "exit whatsapp",
                 "quit instagram",
+                "close camera",
+                "close vs code",
+                "close code",
                 "exit youtube"
             ],
             "responses": [
