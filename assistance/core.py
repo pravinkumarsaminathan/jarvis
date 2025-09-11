@@ -17,18 +17,9 @@ class JarvisAssistant:
         self.y_labels = self.chatbot.y_labels
 
     def run(self, query):
-        # #wish_me()
-        # while True:
-        #     #query = command()
-        #     query = input("Enter input:").lower()
+        
 
-        #     if query == "none":
-        #         continue
-        #     if "exit" in query:
-        #         speak("Goodbye Boss!")
-        #         sys.exit()
-
-            # ---------------- WhatsApp Handling ----------------
+            # ---------------- NLP (rule based) ----------------
         if "send" in query and "via whatsapp" in query:
             handler = WhatsAppHandler()
             response = handler.handle(query)
@@ -69,7 +60,6 @@ class JarvisAssistant:
         tag = self.y_labels[predicted.item()]
 
         # ---------------- Tag Handling ----------------
-        # ---------------- Tag Handling ----------------
         if tag == "open_app_control" or tag=="open_app_control_tanglish":
             open_app(query, response)
         elif tag == "close_app_control" or tag=="close_app_control_tanglish":
@@ -85,15 +75,6 @@ class JarvisAssistant:
                 volume_control("mute")
             elif "condition" in query or "battery" in query or "CPU" in query:
                 condition()
-            # elif tag == "vulnerable_ports":
-            #     scan_vulnerable_ports()
-            # elif tag == "close_port":
-            #     match = re.search(r'\d+', query)
-            #     if match:
-            #         port = match.group()
-            #         close_port(port)
-            #     else:
-            #         speak("Please specify which port you want me to close.")
         else:
             speak(response)
             print("Bot:", response)

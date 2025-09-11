@@ -28,18 +28,14 @@ def main():
     # Pass it to PopupManager
     manager = PopupManager(app=app)
     manager.show_popup("Sir I am online, click double CTRL to access me", logo_path=logo_path, timeout=7000)
-    for i in range(3):
+    for i in range(2):
         app.processEvents()
         app.sendPostedEvents(None, 0)
-        sleep(1)
+        #sleep(1)
 
-    # Pass the same app to JarvisApp, or let JarvisApp use the existing instance
     wish_me()
     jarvis_app = JarvisApp()
     jarvis_app.run()
-
-    # assistant = JarvisAssistant()
-    # assistant.run()
 
 if __name__ == "__main__":
     main()

@@ -173,43 +173,6 @@ def close_app(cmd, response):
     else:
         speak("sorry i don't have access to do that.")
 
-# def scan_vulnerable_ports():
-#     try:
-#         nm = nmap.PortScanner()
-#         # Run nmap with vulnerability detection scripts
-#         nm.scan('127.0.0.1', arguments='-sV --script vuln')
-#         speak("Scanning for vulnerable ports...")
-#         vulnerable_ports = []
-
-#         for host in nm.all_hosts():
-#             for proto in nm[host].all_protocols():
-#                 for port, details in nm[host][proto].items():
-#                     if details['state'] == "open":
-#                         script_output = details.get('script', {})
-#                         if script_output:  # If vulnerability script found something
-#                             vulnerable_ports.append(f"{port} ({details['name']})")
-#         speak("Finished scanning...")
-#         if vulnerable_ports:
-#             ports_str = ", ".join(vulnerable_ports)
-#             speak(f"The vulnerable ports on your system are {ports_str}")
-#         else:
-#             speak("No vulnerable ports detected on your system")
-#     except Exception as e:
-#         speak("Sorry boss, I could not complete the port scan")
-#         print(f"[Error] {e}")
-
-
-# def close_port(port):
-#     try:
-#         # Using ufw to block the port
-#         cmd = f"sudo ufw deny {port}"
-#         os.system(cmd + " > /dev/null 2>&1")
-#         speak(f"Port {port} has been blocked successfully")
-#     except Exception as e:
-#         speak(f"Sorry boss, I could not close port {port}")
-#         print(f"[Error] {e}")
-
-
 def schedule():
     today = cal_day().lower()
     week = {

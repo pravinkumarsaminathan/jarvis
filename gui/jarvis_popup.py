@@ -35,11 +35,8 @@ class JarvisPopup(QWidget):
         btn_row = QHBoxLayout()
         btn_row.setSpacing(20)
 
-        self.click_btn = QPushButton("⚡ Engage")
         self.dismiss_btn = QPushButton("✖ Dismiss")
 
-        # Connect actions (default: close)
-        self.click_btn.clicked.connect(self.close)
         self.dismiss_btn.clicked.connect(self.close)
 
         # Button style
@@ -60,10 +57,8 @@ class JarvisPopup(QWidget):
                 color: black;
             }
         """
-        self.click_btn.setStyleSheet(btn_style)
         self.dismiss_btn.setStyleSheet(btn_style)
 
-        btn_row.addWidget(self.click_btn)
         btn_row.addWidget(self.dismiss_btn)
         layout.addLayout(btn_row)
 
