@@ -10,6 +10,26 @@ import speech_recognition as sr
 import nmap
 import threading
 import wikipedia
+from pynput import keyboard
+import tempfile
+import speedtest
+import socket
+
+VULNERABLE_PORTS = {
+    21: "FTP",
+    22: "SSH",
+    23: "Telnet",
+    25: "SMTP",
+    53: "DNS",
+    69: "TFTP",
+    80: "HTTP",
+    110: "POP3",
+    139: "NetBIOS",
+    143: "IMAP",
+    443: "HTTPS",
+    445: "SMB",
+    3389: "RDP"
+}
 
 OPENWEATHER_API_KEY = "ca8004bcd630a58b8fc39755e6dfb46c"   # replace with your API key
 
@@ -47,25 +67,56 @@ def command():
     finally:
         os.dup2(old_stderr, 2)
         os.close(devnull)
+        
+# def detect_voice(query):
+#     """
+#     Detect if the query is in English or Thanglish (Tamil in Latin script).
+#     Returns the appropriate voice string.
+#     """
+#     words = set(query.lower().split())
+#     if THANGLISH_KEYWORDS & words:
+#         return "ta-IN-PallaviNeural"
+#     return "en-US-AriaNeural"
 
-def detect_voice(query):
-    """
-    Detect if the query is in English or Thanglish (Tamil in Latin script).
-    Returns the appropriate voice string.
-    """
-    words = set(query.lower().split())
-    if THANGLISH_KEYWORDS & words:
-        return "ta-IN-PallaviNeural"
-    return "en-US-AriaNeural"
+# _speak_lock = threading.Lock()
+
+# def speak(text, speed=1.0):
+#     with _speak_lock:
+#         voice = detect_voice(text)
+#         """
+#         Stream TTS from local server and play instantly with mpg123.
+#         """
+#         payload = {
+#             "input": text,
+#             "voice": voice,
+#             "response_format": "mp3",
+#             "speed": speed
+#         }
+
+#         curl_cmd = [
+#             "curl", "-s", "-X", "POST", "http://localhost:5050/v1/audio/speech",
+#             "-H", "Content-Type: application/json",
+#             "-H", "Authorization: Bearer your_api_key_here",
+#             "-d", json.dumps(payload)
+#         ]
+
+#         mpg123_cmd = ["mpg123", "-"]
+#         curl_proc = subprocess.Popen(curl_cmd, stdout=subprocess.PIPE)
+#         subprocess.run(mpg123_cmd, stdin=curl_proc.stdout, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+#         curl_proc.stdout.close()
+#         curl_proc.wait()
+    #os.system(f'edge-playback --text "{text}" --voice en-US-AriaNeural > /dev/null 2>&1')
+
 
 _speak_lock = threading.Lock()
+_stop_speaking = threading.Event()
 
 def speak(text, speed=1.0):
+    global _stop_speaking
     with _speak_lock:
-        voice = detect_voice(text)
-        """
-        Stream TTS from local server and play instantly with mpg123.
-        """
+        _stop_speaking.clear()
+        voice ="en-US-AriaNeural"
+
         payload = {
             "input": text,
             "voice": voice,
@@ -73,19 +124,43 @@ def speak(text, speed=1.0):
             "speed": speed
         }
 
+        # Save TTS to a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
+            tmp_filename = tmp_file.name
+
         curl_cmd = [
             "curl", "-s", "-X", "POST", "http://localhost:5050/v1/audio/speech",
             "-H", "Content-Type: application/json",
             "-H", "Authorization: Bearer your_api_key_here",
-            "-d", json.dumps(payload)
+            "-d", json.dumps(payload),
+            "-o", tmp_filename  # save output to file
         ]
 
-        mpg123_cmd = ["mpg123", "-"]
-        curl_proc = subprocess.Popen(curl_cmd, stdout=subprocess.PIPE)
-        subprocess.run(mpg123_cmd, stdin=curl_proc.stdout, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        curl_proc.stdout.close()
-        curl_proc.wait()
-    #os.system(f'edge-playback --text "{text}" --voice en-US-AriaNeural > /dev/null 2>&1')
+        listener = keyboard.Listener(on_press=on_press)
+        listener.start()
+
+        subprocess.run(curl_cmd)
+
+        # Play the file with mpg123
+        player_proc = subprocess.Popen(["mpg123", tmp_filename],
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        while player_proc.poll() is None:
+            if _stop_speaking.is_set():
+                player_proc.terminate()
+                break
+
+        player_proc.wait()
+        os.remove(tmp_filename)  # clean up temp file
+
+# Listener for 'q' key
+def on_press(key):
+    try:
+        if key.char == 'q':
+            _stop_speaking.set()
+            return False
+    except AttributeError:
+        pass
 
 def wish_me():
     hour = int(datetime.datetime.now().hour)
@@ -362,3 +437,112 @@ def order_product(query: str) -> str:
         webbrowser.open(f"https://www.flipkart.com/search?q={product.replace(' ', '+')}")
 
     return f"Searching deals on {product} on {platform}."
+
+def get_speed_inference():
+    st = speedtest.Speedtest()
+    st.get_best_server()
+    download_speed = st.download() / 1_000_000  # Mbps
+    upload_speed = st.upload() / 1_000_000      # Mbps
+    ping = st.results.ping
+
+    # Make inference based on speed
+    if download_speed > 50:
+        download_status = "excellent"
+    elif download_speed > 20:
+        download_status = "good"
+    else:
+        download_status = "slow"
+
+    if upload_speed > 20:
+        upload_status = "excellent"
+    elif upload_speed > 10:
+        upload_status = "good"
+    else:
+        upload_status = "slow"
+
+    inference = (f"Your internet speed is as follows: Download is {download_speed:.2f} Mbps, "
+                 f"which is {download_status}. Upload is {upload_speed:.2f} Mbps, "
+                 f"which is {upload_status}. Ping is {ping} ms.")
+
+    return inference
+
+def get_ip_address():
+    # Get local IP
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+
+    # # Get public IP
+    # try:
+    #     public_ip = requests.get('https://api.ipify.org').text
+    # except:
+    #     public_ip = "Could not fetch public IP. Check your internet connection."
+
+    return f"Your local IP address is {local_ip}."# Your public IP address is {public_ip}."
+
+
+def nmap_scan_inference(target_ip):
+    """
+    Performs a basic TCP scan and returns a human-readable inference.
+    """
+    try:
+        # Run Nmap TCP scan
+        result = subprocess.run(["nmap", "-sT", target_ip], capture_output=True, text=True)
+        output = result.stdout
+
+        # Simple inference: find open ports
+        open_ports = []
+        for line in output.splitlines():
+            if "open" in line:
+                parts = line.split()
+                port = parts[0] if len(parts) > 0 else ""
+                service = parts[2] if len(parts) > 2 else ""
+                open_ports.append(f"{port} ({service})")
+
+        # Prepare AI-style response
+        if open_ports:
+            inference = f"I scanned this device and found the following open ports: {', '.join(open_ports)}."
+        else:
+            inference = f"I scanned this device but could not find any open ports."
+
+        return inference
+
+    except FileNotFoundError:
+        return "Nmap is not installed. Please install Nmap and try again."
+    except Exception as e:
+        return f"Error running Nmap scan: {e}"
+    
+
+def nmap_vulnerable_scan(target_ip):
+    """
+    Scans target IP and reports vulnerable/risky ports found.
+    """
+    try:
+        # Basic TCP scan
+        result = subprocess.run(["nmap", "-sT", target_ip], capture_output=True, text=True)
+        output = result.stdout
+
+        # Find open ports
+        open_vulnerable_ports = []
+        for line in output.splitlines():
+            if "open" in line:
+                parts = line.split()
+                port_num = int(parts[0].split("/")[0])
+                service = VULNERABLE_PORTS.get(port_num, parts[2] if len(parts) > 2 else "Unknown")
+                if port_num in VULNERABLE_PORTS:
+                    open_vulnerable_ports.append(f"{port_num} ({service})")
+
+        # Prepare inference
+        if open_vulnerable_ports:
+            inference = (f"Warning: I found potentially vulnerable ports on this device: "
+                         f"{', '.join(open_vulnerable_ports)}. "
+                         "It is recommended to secure these ports.")
+        else:
+            inference = f"No commonly vulnerable ports found on this device. Your system looks safer."
+
+        return inference
+
+    except FileNotFoundError:
+        return "Nmap is not installed. Please install Nmap and try again."
+    except Exception as e:
+        return f"Error running Nmap scan: {e}"
+    
