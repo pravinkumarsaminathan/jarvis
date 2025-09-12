@@ -37,7 +37,7 @@ class JarvisOverlay(QtWidgets.QWidget):
 
     @Slot()
     def _reset_subtitle_later(self):
-        QtCore.QTimer.singleShot(3000, lambda: self.subtitle.setText("           Press CTRL+S to Speak           "))
+        QtCore.QTimer.singleShot(3000, lambda: self.subtitle.setText("  Press CTRL+S to Speak           \n\n           Press Q to Stop Voice          "))
 
     def __init__(self, bridge: Bridge, glow: PerimeterGlow, click_catcher: ClickCatcher):
         super().__init__()
@@ -66,7 +66,7 @@ class JarvisOverlay(QtWidgets.QWidget):
         self.title.setFont(QtGui.QFont("SF Pro Text", 20, QtGui.QFont.DemiBold))
         self.title.setStyleSheet("color: #fff;")
 
-        self.subtitle = QtWidgets.QLabel("           Press CTRL+S to Speak           ", self)
+        self.subtitle = QtWidgets.QLabel("  Press CTRL+S to Speak           \n\n           Press Q to Stop Voice          ", self)
         self.subtitle.setAlignment(QtCore.Qt.AlignHCenter)
         self.subtitle.setFont(QtGui.QFont("SF Pro Text", 11))
         self.subtitle.setStyleSheet("color: rgba(255,255,255,0.85);")

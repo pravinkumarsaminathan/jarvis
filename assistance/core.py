@@ -3,7 +3,7 @@ import torch
 
 from .nlp import ChatbotNLP
 from .whatsapp import WhatsAppHandler
-from .utils import speak, open_app, close_app, schedule, condition, volume_control, command, search_wikipedia, get_weather, play_youtube_music, order_product
+from .utils import speak, open_app, close_app, schedule, condition, volume_control, command, search_wikipedia, get_weather, play_youtube_music, order_product, get_speed_inference, get_ip_address, nmap_scan_inference, nmap_vulnerable_scan
 
 class JarvisAssistant:
     """
@@ -27,6 +27,29 @@ class JarvisAssistant:
             print("Bot:", response)
         elif "weather" in query.lower():
             response = get_weather(query)
+            speak(response)
+            print("Bot:", response)
+            return
+        elif "scan vulnerable ports" in query.lower():
+            target_ip = "127.0.0.1"  # Or ask via voice
+            response = nmap_vulnerable_scan(target_ip)
+            speak(response)
+            print("Bot:", response)
+            return
+        elif "scan" in query.lower() or "ports" in query.lower():
+            target_ip = "127.0.0.1"  # Or get IP from user dynamically
+            response = nmap_scan_inference(target_ip)
+            speak(response)
+            print("Bot:", response)
+            return
+        elif "internet speed" in query.lower() or "network speed" in query.lower():
+            speak("Checking internet speed, please wait a moment.")
+            response = get_speed_inference()  # Calls the function we defined earlier
+            speak(response)  # Your TTS function
+            print("Bot:", response)
+            return
+        elif "my ip" in query.lower() or "ip address" in query.lower():
+            response = get_ip_address()
             speak(response)
             print("Bot:", response)
             return
