@@ -61,6 +61,27 @@ Supports Linux desktops.
 - “Play song”
 ---
 
+## Current Capabilities
+- Weather
+- WhatsApp message
+- Open Instagram
+- Open Facebook
+- Open camera
+- Wikipedia (Elon musk)
+- Open Google
+- Open YouTube
+- Play song
+- Volume (up/down)
+- Today’s Schedule
+- Purchase Options (Flipkart , Amazon)
+- Suggestions
+- Open my yesterday night workspace
+- Ip address
+- System conditions
+- Internet speed
+- Scan vulnerable ports
+- Scan open ports
+
 ##  Architecture
 Double Ctrl → Popup UI → (Optional: STT) → NLP Intent Model → Skill Router → Linux Action Module → Result (Text + Edge-TTS Voice)
 
