@@ -68,15 +68,15 @@ def command():
         os.dup2(old_stderr, 2)
         os.close(devnull)
         
-# def detect_voice(query):
-#     """
-#     Detect if the query is in English or Thanglish (Tamil in Latin script).
-#     Returns the appropriate voice string.
-#     """
-#     words = set(query.lower().split())
-#     if THANGLISH_KEYWORDS & words:
-#         return "ta-IN-PallaviNeural"
-#     return "en-US-AriaNeural"
+def detect_voice(query):
+    """
+    Detect if the query is in English or Thanglish (Tamil in Latin script).
+    Returns the appropriate voice string.
+    """
+    words = set(query.lower().split())
+    if THANGLISH_KEYWORDS & words:
+        return "ta-IN-PallaviNeural"
+    return "en-US-AriaNeural"
 
 # _speak_lock = threading.Lock()
 
@@ -115,7 +115,7 @@ def speak(text, speed=1.0):
     global _stop_speaking
     with _speak_lock:
         _stop_speaking.clear()
-        voice ="en-US-AriaNeural"
+        voice = detect_voice(text)
 
         payload = {
             "input": text,

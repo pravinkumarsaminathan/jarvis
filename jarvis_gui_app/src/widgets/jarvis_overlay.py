@@ -376,7 +376,7 @@ class JarvisOverlay(QtWidgets.QWidget):
             return
         self.subtitle_update.emit("Recognizing…")
         try:
-            text = recognizer.recognize_google(audio)
+            text = recognizer.recognize_google(audio, language="en-IN")
             cleaned = text.strip().lower()
             if not cleaned:
                 self.subtitle_update.emit("try again...")

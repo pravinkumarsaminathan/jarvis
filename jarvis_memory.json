@@ -1,17 +1,47 @@
 [
   {
     "action": "Opened firefox-esr",
-    "timestamp": "2025-09-10 08:36 PM"
+    "timestamp": "2025-09-21 08:36 PM"
   },
   {
     "action": "Opened code",
-    "timestamp": "2025-09-10 09:38 PM"
+    "timestamp": "2025-09-21 09:38 PM"
   },
   {
     "action": "Opened qterminal",
-    "timestamp": "2025-09-10 10:38 PM",
+    "timestamp": "2025-09-21 10:38 PM",
     "details": {
       "cwd": "/home/pravin"
     }
+  },
+  {
+    "action": "Opened qterminal",
+    "timestamp": "2025-09-22 10:32 AM",
+    "details": {
+      "cwd": "/home/pravin"
+    }
+  },
+  {
+    "action": "Opened firefox-esr",
+    "timestamp": "2025-09-22 10:32 AM"
+  },
+  {
+    "action": "Opened firefox-esr",
+    "timestamp": "2025-09-22 11:36 AM"
+  },
+  {
+    "action": "Opened qterminal",
+    "timestamp": "2025-09-22 11:36 AM",
+    "details": {
+      "cwd": "/home/pravin"
+    }
+  },
+  {
+    "action": "Opened code",
+    "timestamp": "2025-09-22 11:42 AM"
+  },
+  {
+    "action": "Closed firefox-esr",
+    "timestamp": "2025-09-22 11:52 AM"
   }
 ]

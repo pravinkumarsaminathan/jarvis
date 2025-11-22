@@ -25,6 +25,14 @@ class JarvisAssistant:
             response = handler.handle(query)
             speak(response)
             print("Bot:", response)
+        elif "team name" in query.lower():
+            speak("Our Team name is Ninjas")
+            print("Bot: Our Team name is Ninjas")
+            return
+        elif "your name" in query.lower():
+            speak("My name is Jarvis , How can i help you today")
+            print("Bot: My name is Jarvis , How can i help you today")
+            return
         elif "weather" in query.lower():
             response = get_weather(query)
             speak(response)

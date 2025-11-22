@@ -1,0 +1,259 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hey there",
+        "Yo buddy",
+        "Namaskaram"
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "Catch you later",
+        "Talk to you soon",
+        "See ya",
+        "Bye for now"
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "Thanks so much",
+        "Thank you very much"
+      ]
+    },
+    {
+      "tag": "jokes",
+      "patterns": [
+        "Say something funny",
+        "Tell another joke",
+        "Crack a joke"
+      ]
+    },
+    {
+      "tag": "Identity",
+      "patterns": [
+        "Tell me who you are",
+        "Who exactly are you"
+      ]
+    },
+    {
+      "tag": "datetime",
+      "patterns": [
+        "Can you tell the time",
+        "What's today's date",
+        "What day is it now"
+      ]
+    },
+    {
+      "tag": "whatsup",
+      "patterns": [
+        "How are things",
+        "What’s new",
+        "How you doing today"
+      ]
+    },
+    {
+      "tag": "haha",
+      "patterns": [
+        "That's hilarious",
+        "LOL",
+        "LMAO",
+        "That made me laugh"
+      ]
+    },
+    {
+      "tag": "programmer",
+      "patterns": [
+        "Who built you",
+        "Who created you",
+        "Tell me who made you"
+      ]
+    },
+    {
+      "tag": "insult",
+      "patterns": [
+        "You’re stupid",
+        "Shut your mouth"
+      ]
+    },
+    {
+      "tag": "greetreply",
+      "patterns": [
+        "Feeling good",
+        "All fine"
+      ]
+    },
+    {
+      "tag": "open_app_control",
+      "patterns": [
+        "Launch Google",
+        "Open Chrome for me",
+        "Start YouTube now"
+      ]
+    },
+    {
+      "tag": "close_app_control",
+      "patterns": [
+        "Exit Chrome",
+        "Quit WhatsApp",
+        "Close Instagram now"
+      ]
+    },
+    {
+      "tag": "system_conditions",
+      "patterns": [
+        "Show battery level",
+        "Increase the volume",
+        "Mute sound",
+        "Check CPU usage"
+      ]
+    },
+    {
+      "tag": "vulnerable_ports",
+      "patterns": [
+        "Show open ports",
+        "Scan for weak ports",
+        "Find vulnerabilities in ports"
+      ]
+    },
+    {
+      "tag": "close_port",
+      "patterns": [
+        "Stop port 8080",
+        "Block port 80",
+        "Close port 21"
+      ]
+    },
+    {
+      "tag": "greeting_tanglish",
+      "patterns": [
+        "Hey bro da",
+        "Vanakam da",
+        "Eppadi macha",
+        "Hi bro",
+        "Hello macha"
+      ]
+    },
+    {
+      "tag": "goodbye_tanglish",
+      "patterns": [
+        "Bye bro da",
+        "Seri bye da",
+        "Poi varen bro",
+        "Pakkalam macha"
+      ]
+    },
+    {
+      "tag": "thanks_tanglish",
+      "patterns": [
+        "Romba thanks da",
+        "Thanks bro da",
+        "Super help pannita da"
+      ]
+    },
+    {
+      "tag": "datetime_tanglish",
+      "patterns": [
+        "Naal enna da"
+      ]
+    },
+    {
+      "tag": "whatsup_tanglish",
+      "patterns": [
+        "Enna news bro"
+      ]
+    },
+    {
+      "tag": "haha_tanglish",
+      "patterns": [
+        "Haha bro",
+        "Semma sirippu bro",
+        "Lol da"
+      ]
+    },
+    {
+      "tag": "programmer_tanglish",
+      "patterns": [
+        "Unna yaru da code pannanga",
+        "Unna yaru da create pannanga"
+      ]
+    },
+    {
+      "tag": "insult_tanglish",
+      "patterns": [
+        "Nee useless da",
+        "Shut up bro",
+        "Poda idiot da"
+      ]
+    },
+    {
+      "tag": "activity_tanglish",
+      "patterns": [
+        "Enna da panra",
+        "Epdi da iruka",
+        "Enna da seiya bro"
+      ]
+    },
+    {
+      "tag": "exclaim_tanglish",
+      "patterns": [
+        "Super bro da",
+        "Ok macha",
+        "Semma bro"
+      ]
+    },
+    {
+      "tag": "nicetty_tanglish",
+      "patterns": [
+        "Pesuna super ah iruku da"
+      ]
+    },
+    {
+      "tag": "greetreply_tanglish",
+      "patterns": [
+        "Super ah iruken da",
+        "Fine bro da",
+        "Ok da"
+      ]
+    },
+    {
+      "tag": "open_app_control_tanglish",
+      "patterns": [
+        "Youtube open pannu da",
+        "Chrome la po bro",
+        "Google launch pannu da"
+      ]
+    },
+    {
+      "tag": "close_app_control_tanglish",
+      "patterns": [
+        "Whatsapp exit pannu da",
+        "Chrome close pannu",
+        "Youtube stop pannu bro"
+      ]
+    },
+    {
+      "tag": "system_conditions_tanglish",
+      "patterns": [
+        "Battery status kaatu da",
+        "Mute pannu bro"
+      ]
+    },
+    {
+      "tag": "vulnerable_ports_tanglish",
+      "patterns": [
+        "Weak ports kaatu da"
+      ]
+    },
+    {
+      "tag": "close_port_tanglish",
+      "patterns": [
+        "Port 5000 stop pannu da",
+        "Port 8080 block pannu"
+      ]
+    }
+  ]
+}
