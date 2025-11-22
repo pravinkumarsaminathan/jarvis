@@ -6,6 +6,10 @@ and responds using a **local Edge-TTS server** (open-source).
 
 Built for speed, and full on-device control.
 
+![Jarvis Demo](demo/jarvis-demo.gif)
+## Full Demo (with voice)
+[Click here to watch the full demo](demo/jarvis-demo.mp4)
+
 ---
 
 ## Features
